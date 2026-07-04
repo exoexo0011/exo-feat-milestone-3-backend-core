@@ -61,6 +61,15 @@ class Settings(BaseSettings):
     anthropic_base_url: str = "https://api.anthropic.com/v1"
     anthropic_version: str = "2023-06-01"
 
+    # --- Tool framework ---------------------------------------------------
+    # Filesystem tools are confined to these roots; empty means filesystem
+    # access is denied. ``tool_allowed_apps`` gates the launcher (empty = deny).
+    # ``tool_denied_permissions`` hard-disables whole capability categories.
+    tool_fs_allowed_roots: list[str] = []
+    tool_max_file_bytes: int = 1024 * 1024
+    tool_allowed_apps: list[str] = []
+    tool_denied_permissions: list[str] = []
+
 
 @lru_cache
 def get_settings() -> Settings:

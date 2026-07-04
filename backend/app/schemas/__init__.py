@@ -18,6 +18,7 @@ from app.schemas.conversation import (
 )
 from app.schemas.events import AssistantActionRead, SystemEventCreate, SystemEventRead
 from app.schemas.health import HealthResponse
+from app.schemas.tools import ToolExecuteRequest, ToolResultResponse, ToolSpec
 from app.schemas.user import (
     PreferencesRead,
     PreferenceWrite,
@@ -43,6 +44,9 @@ __all__ = [
     "PreferencesRead",
     "SystemEventCreate",
     "SystemEventRead",
+    "ToolExecuteRequest",
+    "ToolResultResponse",
+    "ToolSpec",
     "TokenEvent",
     "UserProfileRead",
     "UserProfileUpdate",

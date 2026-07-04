@@ -39,5 +39,6 @@ Key principles:
 - WebSocket `/ws/chat` for token streaming, tool status events and confirmation prompts.
 
 Further documents: `docs/ai-providers.md` (provider layer, Milestone 4),
-`docs/chat.md` (chat pipeline: REST + WebSocket, Milestone 5). Planned:
+`docs/chat.md` (chat pipeline: REST + WebSocket, Milestone 5),
+`docs/tools.md` (tool framework + built-in tools, Milestone 6). Planned:
 `docs/api.md`, `docs/installation.md`, `docs/developer-guide.md` (Milestone 8).

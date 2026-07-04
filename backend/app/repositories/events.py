@@ -54,6 +54,28 @@ class EventRepository(BaseRepository):
         await self._session.refresh(action)
         return action
 
+    async def get_action(self, action_id: str) -> AssistantAction:
+        """Return an action by id or raise :class:`NotFoundError`."""
+        action = await self._session.get(AssistantAction, action_id)
+        if action is None:
+            raise NotFoundError(f"Assistant action '{action_id}' not found")
+        return action
+
+    async def list_actions(
+        self, *, conversation_id: str | None = None, limit: int = 100, offset: int = 0
+    ) -> Sequence[AssistantAction]:
+        """Return recent assistant actions, newest first."""
+        stmt = (
+            select(AssistantAction)
+            .order_by(AssistantAction.created_at.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+        if conversation_id is not None:
+            stmt = stmt.where(AssistantAction.conversation_id == conversation_id)
+        result = await self._session.execute(stmt)
+        return result.scalars().all()
+
     async def finish_action(
         self,
         action_id: str,

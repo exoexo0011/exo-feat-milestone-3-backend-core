@@ -88,7 +88,7 @@ class ConversationRepository(BaseRepository):
         stmt = (
             select(Message)
             .where(Message.conversation_id == conversation_id)
-            .order_by(Message.created_at.asc())
+            .order_by(Message.seq.asc())
             .limit(limit)
             .offset(offset)
         )
@@ -102,7 +102,8 @@ class ConversationRepository(BaseRepository):
 
         Unlike :meth:`list_messages` (oldest-first from an offset), this selects
         the newest messages then restores ascending order, which is what the
-        chat context window needs.
+        chat context window needs. Ordering uses the monotonic ``seq`` key so it
+        is reliable even when timestamps collide.
         """
         await self.get(conversation_id)  # Raises NotFoundError for unknown ids.
         if limit <= 0:
@@ -110,7 +111,7 @@ class ConversationRepository(BaseRepository):
         stmt = (
             select(Message)
             .where(Message.conversation_id == conversation_id)
-            .order_by(Message.created_at.desc())
+            .order_by(Message.seq.desc())
             .limit(limit)
         )
         result = await self._session.execute(stmt)

@@ -31,7 +31,7 @@ class Conversation(TimestampMixin, Base):
     messages: Mapped[list["Message"]] = relationship(
         back_populates="conversation",
         cascade="all, delete-orphan",
-        order_by="Message.created_at",
+        order_by="Message.seq",
     )
 
 
@@ -44,7 +44,14 @@ class Message(Base):
 
     __tablename__ = "messages"
 
-    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    # ``seq`` is a monotonic autoincrement key that reflects true insertion
+    # order, used for reliable message ordering (wall-clock ``created_at`` can
+    # collide under coarse OS timer resolution). ``id`` remains the stable,
+    # externally exposed identifier.
+    seq: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id: Mapped[str] = mapped_column(
+        String(32), unique=True, index=True, default=new_id, nullable=False
+    )
     conversation_id: Mapped[str] = mapped_column(
         ForeignKey("conversations.id", ondelete="CASCADE"), nullable=False, index=True
     )

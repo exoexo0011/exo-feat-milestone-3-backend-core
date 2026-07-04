@@ -19,6 +19,7 @@ from app.core.exceptions import register_exception_handlers
 from app.db.session import dispose_db, init_db
 from app.logging_config import setup_logging
 from app.services.ai import ProviderFactory
+from app.services.tools import PermissionPolicy, build_default_registry
 
 logger = logging.getLogger("exo.app")
 
@@ -33,11 +34,16 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # HTTP-backed providers reuse a single connection pool.
     provider = ProviderFactory.create(settings)
     app.state.ai_provider = provider
+    # Build the tool registry and permission policy once; they are stateless and
+    # shared across requests (the per-request engine binds them to a session).
+    app.state.tool_registry = build_default_registry(settings)
+    app.state.permission_policy = PermissionPolicy.from_settings(settings)
     logger.info(
-        "EXO backend %s started (env=%s, ai_provider=%s)",
+        "EXO backend %s started (env=%s, ai_provider=%s, tools=%d)",
         __version__,
         settings.env,
         settings.ai_provider,
+        len(app.state.tool_registry),
     )
     yield
     await provider.aclose()
