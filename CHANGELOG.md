@@ -27,6 +27,10 @@ is a minor release).
   and `RELEASE_NOTES.md`.
 - CI: `frontend:test` (Vitest) and `electron:compile` in build; a Playwright
   `e2e` stage; and a tag-triggered `release` stage that builds artifacts.
+- Durable audit trail: lifecycle events (startup/shutdown, plugin
+  load/enable/disable/error) are persisted to the `system_events` table via the
+  event bus (`app/services/audit.py`) and exposed at `GET /api/system/events`.
+  This wires the previously latent M3 audit model into the running app.
 
 ### Changed
 

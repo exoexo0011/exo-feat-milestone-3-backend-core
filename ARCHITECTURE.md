@@ -66,6 +66,7 @@ Principles:
 | `app/services/memory.py` | `MemoryService` (system prompt + recency window) |
 | `app/services/tools/` | Tool framework + `builtins/` (13 tools) |
 | `app/services/eventbus.py` | In-process pub/sub `EventBus` + event names |
+| `app/services/audit.py` | Persists lifecycle events to the `system_events` table |
 | `app/services/plugins/` | Plugin manifest, context, registry, loader, manager, SDK |
 
 ## 4. Data flow
@@ -239,7 +240,10 @@ app/services/
   consumers (plugins). Handlers may be sync or async; exceptions are isolated so
   one subscriber cannot affect the publisher or siblings. It is created once in
   the lifespan and shared via `app.state.event_bus`. `ChatService` and
-  `ToolExecutionEngine` publish events when a bus is injected.
+  `ToolExecutionEngine` publish events when a bus is injected. A durable audit
+  recorder (`app/services/audit.py`) subscribes to the bus and persists
+  lifecycle events (startup/shutdown, plugin load/enable/disable/error) to the
+  `system_events` table, exposed at `GET /api/system/events`.
 - **PluginManager** (created in the lifespan when `plugins_enabled`) discovers
   plugin directories under `plugins_dir`, validates manifests, orders by
   dependencies, checks `min_exo_version`, imports each package under a unique

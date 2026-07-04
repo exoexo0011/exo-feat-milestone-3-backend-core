@@ -21,12 +21,12 @@ Snapshot dashboard. Regenerated after every milestone.
 | Backend build | 🟢 Pass | App factory + lifespan import cleanly |
 | Frontend build | 🟢 Pass | `vite build`, no warnings (vendor-chunked) |
 | Electron compile | 🟢 Pass | `tsc -p electron` clean |
-| Backend tests | 🟢 Pass | 107 passed (pytest) |
+| Backend tests | 🟢 Pass | 110 passed (pytest) |
 | Frontend tests | 🟢 Pass | 23 passed (vitest, 8 files) |
 | E2E tests | 🟢 Pass | 3 passed (Playwright, headless Chromium) |
 | Lint (ruff / eslint) | 🟢 Pass | backend + frontend clean |
 | Format (black / prettier) | 🟢 Pass | backend + frontend clean |
-| Type check (mypy --strict / tsc) | 🟢 Pass | 56 backend files + frontend, no issues |
+| Type check (mypy --strict / tsc) | 🟢 Pass | 58 backend files + frontend, no issues |
 | Installer build | ⚪ Config only | electron-builder + PyInstaller configured; artifact build runs on platform CI |
 | Coverage | ⚪ Not measured | no coverage tool configured (tracked in TODO) |
 
@@ -69,6 +69,7 @@ Snapshot dashboard. Regenerated after every milestone.
 | `test_tools_framework` | Registry, permissions, sandbox, engine |
 | `test_tools_api` | Tools REST (execute/confirm/deny/history) |
 | `test_eventbus` | Pub/sub, wildcard, async/sync, error isolation |
+| `test_audit` | Lifecycle event persistence + `/api/system/events` |
 | `test_plugin_manifest` | Manifest validation + version compatibility |
 | `test_plugins` | Manager lifecycle, isolation, security, dependencies |
 | `test_plugins_api` | Plugins REST + example plugin integration |

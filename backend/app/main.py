@@ -17,9 +17,10 @@ from app.api.router import api_router
 from app.api.ws import router as ws_router
 from app.config import get_settings
 from app.core.exceptions import register_exception_handlers
-from app.db.session import dispose_db, init_db
+from app.db.session import dispose_db, get_session_factory, init_db
 from app.logging_config import setup_logging
 from app.services.ai import ProviderFactory
+from app.services.audit import register_system_audit
 from app.services.eventbus import EventBus, EventName
 from app.services.plugins import PluginManager
 from app.services.tools import PermissionPolicy, build_default_registry
@@ -42,9 +43,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.tool_registry = build_default_registry(settings)
     app.state.permission_policy = PermissionPolicy.from_settings(settings)
 
-    # Event bus + plugin manager.
+    # Event bus + durable audit trail + plugin manager.
     event_bus = EventBus()
     app.state.event_bus = event_bus
+    register_system_audit(event_bus, get_session_factory())
     plugin_manager: PluginManager | None = None
     if settings.plugins_enabled:
         plugin_manager = PluginManager(

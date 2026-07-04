@@ -235,6 +235,26 @@ UI contributions from enabled plugins (`{ plugin, id, title, schema }` and
 
 ---
 
+## System
+
+### `GET /api/system/events?source=&limit=100`
+
+Recent lifecycle audit events (newest first) — application startup/shutdown and
+plugin lifecycle are persisted to the `system_events` table. Returns
+`SystemEventRead[]`:
+
+```json
+{
+  "id": "…", "level": "info", "source": "lifecycle",
+  "message": "system.startup", "payload": { "version": "0.9.0" },
+  "created_at": "…"
+}
+```
+
+`source` optionally filters (e.g. `lifecycle`); `level` is `info`/`error`.
+
+---
+
 ## Configuration
 
 All behaviour is configured via `EXO_*` environment variables (or a `.env`
