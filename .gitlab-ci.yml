@@ -1,0 +1,55 @@
+stages:
+  - lint
+  - test
+  - build
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  npm_config_cache: "$CI_PROJECT_DIR/.cache/npm"
+
+.python-base:
+  image: python:3.12-slim
+  cache:
+    key: pip-$CI_COMMIT_REF_SLUG
+    paths: [.cache/pip]
+  before_script:
+    - pip install -r backend/requirements-dev.txt
+
+.node-base:
+  image: node:20
+  cache:
+    key: npm-$CI_COMMIT_REF_SLUG
+    paths: [.cache/npm]
+  before_script:
+    - cd frontend
+    - npm install
+
+backend:lint:
+  extends: .python-base
+  stage: lint
+  script:
+    - ruff check backend tests
+    - black --check backend tests
+    - mypy backend/app
+
+backend:test:
+  extends: .python-base
+  stage: test
+  script:
+    - pytest
+
+frontend:lint:
+  extends: .node-base
+  stage: lint
+  script:
+    - npm run lint
+    - npm run format:check
+
+frontend:build:
+  extends: .node-base
+  stage: build
+  script:
+    - npm run build
+  artifacts:
+    paths: [frontend/dist]
+    expire_in: 1 week

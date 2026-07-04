@@ -1,0 +1,47 @@
+[project]
+name = "exo"
+version = "0.1.0"
+description = "EXO - modular, production-grade desktop AI assistant"
+requires-python = ">=3.12"
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["backend", "tests"]
+
+[tool.ruff.lint]
+select = [
+  "E",   # pycodestyle errors
+  "W",   # pycodestyle warnings
+  "F",   # pyflakes
+  "I",   # isort
+  "B",   # bugbear
+  "UP",  # pyupgrade
+  "N",   # pep8-naming
+  "SIM", # simplify
+  "C4",  # comprehensions
+]
+ignore = ["E501"]  # line length handled by black
+
+[tool.mypy]
+python_version = "3.12"
+mypy_path = "backend"
+strict = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+show_error_codes = true
+exclude = ["frontend", "database", "plugins"]
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["backend"]
+addopts = "-ra --strict-markers"
+asyncio_mode = "auto"

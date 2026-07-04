@@ -1,0 +1,28 @@
+# Development stack for EXO.
+# Note: Electron runs natively on the developer machine; the frontend service
+# here serves the web build for browser-based development and CI previews.
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      EXO_ENV: development
+      EXO_HOST: 0.0.0.0
+      EXO_DB_PATH: /data/exo.db
+    volumes:
+      - exo-db:/data
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  exo-db:
