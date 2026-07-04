@@ -11,10 +11,10 @@ extensibility via plugins.
 
 ## Status
 
-- **Current version:** 0.8.0
-- **Current milestone:** Milestone 8 - Plugin Framework (completed)
-- **Next milestone:** Milestone 9 - Documentation & packaging
-- **Estimated overall completion:** ~90%
+- **Current version:** 0.9.0
+- **Current milestone:** Milestone 9 - Documentation & Packaging (completed)
+- **Next milestone:** Post-1.0 hardening (see "Remaining"/"Future")
+- **Estimated overall completion:** ~97% (all planned M1–M9 milestones complete)
 
 ## Completed milestones
 
@@ -41,19 +41,25 @@ extensibility via plugins.
   lifecycle, dependency ordering, failure isolation, enable/disable/reload,
   plugin API (tools/commands/routes/ws/settings/ui/hooks/events), SDK, example
   plugin, and plugins REST API.
+- [x] **M9 - Documentation & packaging:** full API/installation/developer/
+  migration docs + release notes; PyInstaller + electron-builder desktop
+  installers with packaged backend spawn; Playwright E2E; and a CI release
+  pipeline (frontend tests + E2E + tag-triggered artifact build).
 
 ## In progress
 
-- [ ] None (M8 complete; awaiting review before M9).
+- [ ] None (M9 complete; the planned M1–M9 roadmap is delivered).
 
-## Remaining milestones
+## Remaining work (post-1.0 hardening)
 
-- [ ] **M9 - Documentation & packaging:** `docs/api.md`, `docs/installation.md`,
-  `docs/developer-guide.md`, installers, release pipeline, real E2E tests.
 - [ ] **Chat tool-calling loop:** let the model invoke tools during a chat turn
   and stream `tool` events to the (already built) UI indicators.
 - [ ] **Plugin isolation hardening:** subprocess/WASM sandboxing for true
-  process isolation; route teardown on disable.
+  process isolation; route teardown on disable; persisted plugin settings.
+- [ ] **Database migrations (Alembic)** and **authentication** (before any
+  non-local deployment).
+- [ ] **Coverage tooling** (pytest-cov + Vitest coverage) with CI thresholds.
+- [ ] **Signed installers** and per-platform release runners (Windows/macOS).
 
 > Note: milestone numbering follows the delivery order agreed in this project.
 > The plugin system (originally referenced as "Milestone 6" in early notes) is
@@ -104,6 +110,9 @@ extensibility via plugins.
 - Plugin-mounted API routes persist until restart (disable stops tools/commands/
   events/hooks but not already-mounted routes).
 - Plugin settings are in-memory (not persisted across restarts yet).
+- Installers are configured (electron-builder + PyInstaller) but the actual
+  artifact build and code signing run on platform CI/dev machines, not in the
+  development sandbox. Windows/macOS installers need matching runners.
 
 ## Completion by area
 
@@ -111,9 +120,10 @@ extensibility via plugins.
 |---|---|
 | Backend core | 97% |
 | AI system | 90% |
-| Chat system | 85% |
+| Chat system | 88% |
 | Tool system | 92% |
 | Plugin system | 90% |
-| Frontend | 85% |
-| Documentation | 70% |
-| **Overall** | **~90%** |
+| Frontend | 88% |
+| Packaging & release | 90% |
+| Documentation | 95% |
+| **Overall** | **~97%** |

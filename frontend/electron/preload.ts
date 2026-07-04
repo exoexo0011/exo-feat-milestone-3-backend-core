@@ -22,7 +22,7 @@ interface NotifyPayload {
 contextBridge.exposeInMainWorld('exo', {
   isElectron: true,
   platform: process.platform,
-  appVersion: process.env.npm_package_version ?? '0.8.0',
+  appVersion: process.env.npm_package_version ?? '0.9.0',
 
   onBackendStatus(listener: (status: BackendStatus) => void): () => void {
     const channel = 'backend:status';

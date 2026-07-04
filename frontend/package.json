@@ -1,7 +1,7 @@
 {
   "name": "exo-frontend",
   "private": true,
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "EXO desktop AI assistant - Electron + React frontend",
   "main": "dist-electron/main.js",
   "scripts": {
@@ -15,7 +15,11 @@
     "format:check": "prettier --check .",
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "electron:build": "npm run electron:compile && npm run build",
+    "pack": "npm run electron:build && electron-builder --dir",
+    "dist": "npm run electron:build && electron-builder"
   },
   "dependencies": {
     "highlight.js": "^11.11.1",
@@ -27,6 +31,7 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
@@ -39,6 +44,7 @@
     "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
     "electron": "^33.3.1",
+    "electron-builder": "^26.15.3",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.37.3",

@@ -40,7 +40,27 @@ scripts/     Bootstrap and development scripts
 | Frontend lint | `cd frontend && npm run lint && npm run format:check` |
 | Tests | `pytest` |
 
-See `docs/` for the full architecture and developer guide.
+## Packaging (desktop installers)
+
+```bash
+./scripts/package.sh        # Linux/macOS   (Windows: .\scripts\package.ps1)
+```
+
+Builds a self-contained desktop app (backend bundled via PyInstaller, packaged
+with electron-builder) into `frontend/release/`. See
+[docs/installation.md](docs/installation.md).
+
+## Documentation
+
+| Doc | Contents |
+|---|---|
+| [docs/architecture.md](docs/architecture.md) | High-level architecture |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Living, detailed architecture |
+| [docs/api.md](docs/api.md) | REST + WebSocket API reference |
+| [docs/installation.md](docs/installation.md) | Install & configuration |
+| [docs/developer-guide.md](docs/developer-guide.md) | Contributing & extending |
+| [docs/migration-guide.md](docs/migration-guide.md) | Upgrade notes |
+| [docs/ai-providers.md](docs/ai-providers.md) · [chat.md](docs/chat.md) · [tools.md](docs/tools.md) · [plugins.md](docs/plugins.md) | Subsystem guides |
 
 ## License
 

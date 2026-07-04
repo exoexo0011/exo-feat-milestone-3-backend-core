@@ -57,6 +57,39 @@ export class BackendManager {
       : join(app.getAppPath(), '..', 'backend');
   }
 
+  /**
+   * Choose how to launch the backend.
+   *
+   * Packaged builds run the self-contained PyInstaller executable and are told
+   * (via ``EXO_*`` env) to store data under the OS ``userData`` directory, which
+   * is writable (unlike the read-only install/resources directory). In a
+   * non-packaged run the developer's Python + uvicorn is used.
+   */
+  private launchSpec(): { command: string; args: string[]; env: NodeJS.ProcessEnv } {
+    if (app.isPackaged) {
+      const executable = process.platform === 'win32' ? 'exo-backend.exe' : 'exo-backend';
+      const userData = app.getPath('userData');
+      return {
+        command: join(process.resourcesPath, 'backend', executable),
+        args: [],
+        env: {
+          ...process.env,
+          EXO_ENV: 'production',
+          EXO_HOST: '127.0.0.1',
+          EXO_PORT: '8000',
+          EXO_DB_PATH: join(userData, 'database', 'exo.db'),
+          EXO_LOG_DIR: join(userData, 'logs'),
+          EXO_PLUGINS_DIR: join(process.resourcesPath, 'plugins'),
+        },
+      };
+    }
+    return {
+      command: process.env.EXO_PYTHON ?? 'python',
+      args: ['-m', 'uvicorn', 'app.main:app', '--host', '127.0.0.1', '--port', '8000'],
+      env: { ...process.env },
+    };
+  }
+
   start(): void {
     this.stopping = false;
     this.spawnProcess();
@@ -64,12 +97,8 @@ export class BackendManager {
 
   private spawnProcess(): void {
     this.update({ phase: 'starting' });
-    const python = process.env.EXO_PYTHON ?? 'python';
-    const child = spawn(
-      python,
-      ['-m', 'uvicorn', 'app.main:app', '--host', '127.0.0.1', '--port', '8000'],
-      { cwd: this.backendCwd(), env: { ...process.env } },
-    );
+    const { command, args, env } = this.launchSpec();
+    const child = spawn(command, args, { cwd: this.backendCwd(), env });
     this.child = child;
     child.on('error', (error) => this.update({ phase: 'error', detail: error.message }));
     child.on('exit', (code) => this.handleExit(code));

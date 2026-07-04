@@ -38,7 +38,8 @@ Key principles:
 - REST for CRUD (conversations, settings, tools, memory, health).
 - WebSocket `/ws/chat` for token streaming, tool status events and confirmation prompts.
 
-Further documents: `docs/ai-providers.md` (provider layer, Milestone 4),
-`docs/chat.md` (chat pipeline: REST + WebSocket, Milestone 5),
-`docs/tools.md` (tool framework + built-in tools, Milestone 6). Planned:
-`docs/api.md`, `docs/installation.md`, `docs/developer-guide.md` (Milestone 8).
+Further documents: `docs/ai-providers.md` (provider layer), `docs/chat.md` (chat
+pipeline), `docs/tools.md` (tool framework), `docs/plugins.md` (plugin
+framework), `docs/api.md` (REST + WebSocket reference), `docs/installation.md`,
+`docs/developer-guide.md`, and `docs/migration-guide.md`. See `ARCHITECTURE.md`
+(repo root) for the living, detailed architecture.

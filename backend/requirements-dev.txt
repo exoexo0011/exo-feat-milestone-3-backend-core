@@ -6,3 +6,7 @@ pytest==8.3.4
 pytest-asyncio==0.25.0
 # httpx is a runtime dependency (see requirements.txt) and is also used by
 # fastapi's TestClient.
+
+# Packaging (build-time only): bundles the backend into a self-contained
+# executable for the desktop installer. See backend/packaging/exo-backend.spec.
+pyinstaller==6.21.0

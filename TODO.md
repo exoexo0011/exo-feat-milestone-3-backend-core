@@ -9,10 +9,11 @@ Medium (important, not blocking), Low (nice-to-have / hygiene).
 - **Chat tool-calling loop** — Let the model request tool execution mid-chat,
   stream `tool` events to the UI (indicators already built), and feed results
   back into the turn.
-  Status: Not started · Priority: High · Milestone: M9
-- **Documentation & packaging (M9)** — `docs/api.md`, `docs/installation.md`,
-  `docs/developer-guide.md`; desktop installers and release pipeline.
-  Status: Not started · Priority: High · Milestone: M9
+  Status: Not started · Priority: High · Milestone: Post-1.0
+- **Build & sign installers on platform runners** — Execute the (already
+  configured) electron-builder + PyInstaller build on Windows/macOS/Linux CI
+  runners and code-sign the output.
+  Status: Not started · Priority: High · Milestone: Post-1.0
 
 ## Medium Priority
 
@@ -51,6 +52,13 @@ Medium (important, not blocking), Low (nice-to-have / hygiene).
 
 ## Completed
 
+- **Documentation & packaging (M9)** — Full API/installation/developer/migration
+  docs + release notes; PyInstaller + electron-builder packaging with packaged
+  backend spawn; Playwright E2E; CI release pipeline.
+  Status: Done · Priority: High · Milestone: M9
+- **WebSocket disconnect robustness (M9)** — Client disconnect mid-stream no
+  longer crashes the ASGI task.
+  Status: Done · Priority: Medium · Milestone: M9
 - **Plugin framework (M8)** — EventBus, manifest + permissions + version compat,
   PluginContext (DI), registry/loader/manager, lifecycle + dependency ordering +
   failure isolation, plugin API, SDK, example plugin, plugins REST API.

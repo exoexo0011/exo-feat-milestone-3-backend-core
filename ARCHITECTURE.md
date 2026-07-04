@@ -4,7 +4,7 @@ Living architecture document, kept in sync with the codebase. High-level
 overview lives here; subsystem detail is in `docs/` (`ai-providers.md`,
 `chat.md`, `tools.md`).
 
-**Version:** 0.8.0 · **Last updated:** 2026-07-04 (Milestone 8)
+**Version:** 0.9.0 · **Last updated:** 2026-07-04 (Milestone 9)
 
 ## 1. System overview
 
@@ -215,9 +215,10 @@ frontend/electron/
 - **Windowing:** closing hides to the system tray; bounds are persisted and
   restored across launches.
 
-> The Electron layer compiles cleanly (`tsc -p electron`) but its runtime
-> (process spawn, tray, packaging) is not exercised in the headless CI
-> environment; real end-to-end coverage is scheduled for M9.
+> The Electron layer compiles cleanly (`tsc -p electron`). As of M9 the backend
+> spawn is implemented for both dev (`python -m uvicorn`) and packaged
+> (bundled `exo-backend` executable) modes; installer builds run on platform CI
+> runners (see §13).
 
 ## 12. Event system & plugin framework
 
@@ -264,3 +265,31 @@ discovered ──load──► enabled ──disable──► disabled ──ena
         version/dep         
         failure ─────────► error
 ```
+
+## 13. Packaging, distribution & CI
+
+```
+PyInstaller (backend/packaging/exo-backend.spec)
+    -> backend/packaging/dist/exo-backend/   (self-contained backend)
+electron-builder (frontend/electron-builder.yml)
+    -> frontend/release/                     (NSIS / dmg / AppImage)
+       extraResources: <resources>/backend, <resources>/plugins
+```
+
+- **Backend bundle:** PyInstaller freezes `exo_backend.py` (which runs uvicorn on
+  the imported `app`) into a onedir executable.
+- **Desktop app:** electron-builder packages the compiled renderer
+  (`dist/`) + Electron main (`dist-electron/`) and ships the backend bundle and
+  `plugins/` as extra resources. At runtime `electron/backend.ts` spawns
+  `<resources>/backend/exo-backend`, health-checks it, and points `EXO_DB_PATH` /
+  `EXO_LOG_DIR` at the OS `userData` directory (writable).
+- **Build scripts:** `scripts/package.sh` / `scripts/package.ps1` run both steps.
+- **CI (`.gitlab-ci.yml`):** stages `lint → test → build → e2e → release`.
+  `test` runs pytest + Vitest; `e2e` provisions Python (uv) + Chromium
+  (Playwright) and runs the smoke suite; `release` (on tags) builds the backend
+  bundle and desktop installer artifacts.
+- **E2E:** Playwright starts the backend (echo provider) + Vite dev server via
+  managed `webServer`s and drives headless Chromium (`frontend/e2e/`).
+
+> Installer artifact builds and code signing run on platform-specific runners,
+> not in the development sandbox.

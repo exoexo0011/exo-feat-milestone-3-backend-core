@@ -39,15 +39,24 @@ Severity: Critical / High / Medium / Low.
 - **Workaround:** Use the `/api/tools` endpoints directly.
 - **Planned fix:** Chat tool-calling loop (M8).
 
-### ISSUE-007 - Electron runtime not exercised headlessly
+### ISSUE-012 - Installer artifacts are not built/signed in the dev sandbox
 - **Severity:** Low
 - **Status:** Open
-- **Description:** The Electron main/preload compile cleanly, but process spawn,
-  system tray, native notifications, and packaging are not run in this headless
-  environment, and there is no automated end-to-end test.
-- **Workaround:** Manual verification on a desktop; component/integration tests
-  cover the renderer.
-- **Planned fix:** Playwright/Electron E2E and a real tray icon asset (M9).
+- **Description:** electron-builder + PyInstaller are configured and the build
+  scripts + CI release job exist, but producing signed installers requires
+  platform-specific runners and signing secrets; it is not done in the
+  development sandbox.
+- **Workaround:** Run `scripts/package.*` on the target OS / CI runner.
+- **Planned fix:** Platform release runners + code signing (post-1.0).
+
+### ISSUE-007 - Electron shell not covered by automated GUI tests
+- **Severity:** Low
+- **Status:** Partially addressed (M9)
+- **Description:** Playwright E2E now covers the renderer + REST/WebSocket stack
+  (against a live backend), but the Electron shell itself (window lifecycle,
+  system tray, native notifications, backend process spawn) is not automated.
+- **Workaround:** Manual verification on a desktop.
+- **Planned fix:** Electron-level E2E and a real tray icon asset (post-1.0).
 
 ### ISSUE-006 - File attachments are text-only and inlined
 - **Severity:** Low

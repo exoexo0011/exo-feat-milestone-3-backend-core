@@ -7,7 +7,44 @@ is a minor release).
 
 ## [Unreleased]
 
-- Milestone 9 (documentation & packaging) and the chat tool-calling loop not yet started.
+- Chat tool-calling loop and true plugin sandboxing not yet started.
+
+## [0.9.0] - 2026-07-04 - Milestone 9: Documentation & Packaging
+
+### Added
+
+- Desktop packaging: PyInstaller bundles the backend
+  (`backend/packaging/exo_backend.py` + `exo-backend.spec`); electron-builder
+  (`frontend/electron-builder.yml`) produces Windows NSIS / macOS dmg / Linux
+  AppImage installers shipping the backend bundle and `plugins/` as extra
+  resources. Build scripts `scripts/package.sh` / `scripts/package.ps1` and npm
+  `pack`/`dist`/`electron:build` scripts.
+- End-to-end tests: Playwright (`frontend/e2e/smoke.spec.ts`,
+  `playwright.config.ts`) driving the full stack (renderer -> backend, echo
+  provider) via managed dev servers.
+- Documentation: `docs/api.md` (REST + WebSocket reference),
+  `docs/installation.md`, `docs/developer-guide.md`, `docs/migration-guide.md`,
+  and `RELEASE_NOTES.md`.
+- CI: `frontend:test` (Vitest) and `electron:compile` in build; a Playwright
+  `e2e` stage; and a tag-triggered `release` stage that builds artifacts.
+
+### Changed
+
+- `electron/backend.ts` launches the bundled `exo-backend` executable in
+  packaged builds (with `EXO_*` env pointing data/logs at the writable per-user
+  `userData` directory) and keeps `python -m uvicorn` for development.
+- Package versions aligned to `0.9.0` (backend + frontend).
+
+### Fixed
+
+- Chat WebSocket: a client disconnecting mid-stream no longer raises an
+  unhandled `RuntimeError` in the ASGI task; sends after close are normalised to
+  a clean disconnect (found via the new E2E run).
+
+### Dependencies
+
+- Added (backend dev, build-only): `pyinstaller==6.21.0`.
+- Added (frontend dev): `electron-builder`, `@playwright/test`.
 
 ## [0.8.0] - 2026-07-04 - Milestone 8: Plugin Framework
 
@@ -240,7 +277,8 @@ is a minor release).
 - FastAPI app factory, `/api/health` endpoint, and the frontend skeleton shell
   verifying the full stack.
 
-[Unreleased]: https://gitlab.com/exo-group9325627/exo/-/compare/v0.8.0...HEAD
+[Unreleased]: https://gitlab.com/exo-group9325627/exo/-/compare/v0.9.0...HEAD
+[0.9.0]: https://gitlab.com/exo-group9325627/exo/-/releases/v0.9.0
 [0.8.0]: https://gitlab.com/exo-group9325627/exo/-/releases/v0.8.0
 [0.7.0]: https://gitlab.com/exo-group9325627/exo/-/releases/v0.7.0
 [0.6.0]: https://gitlab.com/exo-group9325627/exo/-/releases/v0.6.0

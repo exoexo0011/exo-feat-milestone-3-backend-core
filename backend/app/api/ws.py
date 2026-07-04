@@ -61,16 +61,35 @@ async def chat_ws(websocket: WebSocket, session: DbSession) -> None:
                                 finish_reason=event.finish_reason,
                             ),
                         )
+            except WebSocketDisconnect:
+                # Client went away mid-stream; abandon this turn cleanly.
+                raise
             except ExoError as exc:
                 # Expected domain errors (e.g. unknown conversation).
-                await _send(websocket, ErrorEvent(detail=exc.message))
+                await _safe_send(websocket, ErrorEvent(detail=exc.message))
             except Exception:
                 logger.exception("Unexpected error during chat stream")
-                await _send(websocket, ErrorEvent(detail="Internal error during generation."))
+                await _safe_send(websocket, ErrorEvent(detail="Internal error during generation."))
     except WebSocketDisconnect:
         logger.debug("Chat WebSocket disconnected")
 
 
 async def _send(websocket: WebSocket, event: TokenEvent | DoneEvent | ErrorEvent) -> None:
-    """Serialise a Pydantic event to JSON-safe primitives and send it."""
-    await websocket.send_json(event.model_dump(mode="json"))
+    """Serialise a Pydantic event and send it.
+
+    If the client has already disconnected, the underlying send raises; we
+    normalise that to :class:`WebSocketDisconnect` so the caller unwinds cleanly
+    instead of crashing the ASGI task.
+    """
+    try:
+        await websocket.send_json(event.model_dump(mode="json"))
+    except RuntimeError as exc:  # Starlette raises this when sending after close.
+        raise WebSocketDisconnect() from exc
+
+
+async def _safe_send(websocket: WebSocket, event: TokenEvent | DoneEvent | ErrorEvent) -> None:
+    """Best-effort send that ignores a already-closed connection."""
+    try:
+        await _send(websocket, event)
+    except WebSocketDisconnect:
+        logger.debug("Skipped send to a closed WebSocket")

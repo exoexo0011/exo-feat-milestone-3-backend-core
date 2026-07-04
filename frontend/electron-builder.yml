@@ -1,0 +1,51 @@
+# electron-builder configuration for the EXO desktop app.
+#
+# Packaging is a two-step build (see scripts/package.*):
+#   1. PyInstaller bundles the backend -> backend/packaging/dist/exo-backend/
+#   2. electron-builder packages the renderer + Electron shell and ships the
+#      backend bundle and the plugins directory as extra resources.
+appId: com.exo.assistant
+productName: EXO
+copyright: Copyright (c) 2026 EXO
+
+directories:
+  output: release
+  buildResources: build
+
+# Only the compiled outputs and manifest are packaged into the asar.
+files:
+  - dist/**
+  - dist-electron/**
+  - package.json
+
+# Shipped alongside the app under <resources>/. The Electron main process
+# spawns <resources>/backend/exo-backend and discovers plugins in
+# <resources>/plugins.
+extraResources:
+  - from: ../backend/packaging/dist/exo-backend
+    to: backend
+  - from: ../plugins
+    to: plugins
+    filter:
+      - '**/*'
+      - '!**/__pycache__/**'
+
+win:
+  target:
+    - nsis
+  artifactName: ${productName}-${version}-Setup.${ext}
+
+mac:
+  target:
+    - dmg
+  category: public.app-category.productivity
+
+linux:
+  target:
+    - AppImage
+  category: Utility
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true

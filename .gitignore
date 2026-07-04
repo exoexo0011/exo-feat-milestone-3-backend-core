@@ -17,7 +17,13 @@ node_modules/
 frontend/dist/
 frontend/dist-electron/
 frontend/release/
+frontend/playwright-report/
+frontend/test-results/
 *.tsbuildinfo
+
+# Packaging (PyInstaller output lives in backend/packaging/{build,dist})
+backend/packaging/build/
+backend/packaging/dist/
 
 # Environment
 .env

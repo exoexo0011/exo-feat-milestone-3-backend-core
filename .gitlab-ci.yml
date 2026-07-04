@@ -2,6 +2,8 @@ stages:
   - lint
   - test
   - build
+  - e2e
+  - release
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
@@ -45,11 +47,60 @@ frontend:lint:
     - npm run lint
     - npm run format:check
 
+frontend:test:
+  extends: .node-base
+  stage: test
+  script:
+    - npm run test
+
 frontend:build:
   extends: .node-base
   stage: build
   script:
+    - npm run electron:compile
     - npm run build
   artifacts:
     paths: [frontend/dist]
     expire_in: 1 week
+
+# End-to-end smoke tests: needs both Python (backend) and Node + a browser.
+# uv provisions Python 3.12; Playwright provisions Chromium.
+e2e:
+  stage: e2e
+  image: node:20
+  before_script:
+    - curl -LsSf https://astral.sh/uv/install.sh | sh
+    - export PATH="$HOME/.local/bin:$PATH"
+    - uv venv --python 3.12 .venv
+    - . .venv/bin/activate
+    - uv pip install -r backend/requirements-dev.txt
+    - (cd frontend && npm install && npx playwright install --with-deps chromium)
+  script:
+    - . .venv/bin/activate
+    - cd frontend && npm run test:e2e
+  artifacts:
+    when: on_failure
+    paths: [frontend/playwright-report, frontend/test-results]
+    expire_in: 1 week
+
+# Release: builds the backend bundle + desktop installer on tags.
+# This Linux job produces the AppImage; Windows (NSIS) and macOS (dmg)
+# installers require platform-specific runners with the same steps.
+release:
+  stage: release
+  image: node:20
+  rules:
+    - if: "$CI_COMMIT_TAG"
+  before_script:
+    - curl -LsSf https://astral.sh/uv/install.sh | sh
+    - export PATH="$HOME/.local/bin:$PATH"
+    - uv venv --python 3.12 .venv
+    - . .venv/bin/activate
+    - uv pip install -r backend/requirements-dev.txt
+  script:
+    - . .venv/bin/activate
+    - (cd backend/packaging && pyinstaller --clean --noconfirm exo-backend.spec)
+    - (cd frontend && npm install && npm run dist)
+  artifacts:
+    paths: [frontend/release]
+    expire_in: 30 days

@@ -4,6 +4,53 @@ Chronological record of significant technical decisions. Newest first.
 
 ---
 
+## ADR-0021 - Package with electron-builder + PyInstaller
+
+- **Date:** 2026-07-04 (M9)
+- **Decision:** Bundle the backend with PyInstaller (onedir) and package the
+  desktop app with electron-builder, shipping the backend bundle + `plugins/` as
+  extra resources.
+- **Reason:** Both are the mature, standard tools for their layer; end users get
+  a single installer needing neither Python nor Node.
+- **Alternatives considered:** Tauri (would replace Electron + the whole UI
+  layer); electron-forge; embedding a full Python runtime manually.
+- **Advantages:** Standard, well-documented, cross-platform; keeps the existing
+  Electron/React stack.
+- **Disadvantages:** Two build tools; large artifacts; installer build + signing
+  require platform runners (not verifiable in the dev sandbox).
+- **Impact:** `frontend/electron-builder.yml`, `backend/packaging/`, scripts, CI.
+
+## ADR-0020 - Packaged backend runs as a spawned executable with userData paths
+
+- **Date:** 2026-07-04 (M9)
+- **Decision:** In packaged builds the Electron main process spawns the bundled
+  `exo-backend` executable and injects `EXO_*` env so the DB and logs live under
+  the OS `userData` directory; dev keeps `python -m uvicorn`.
+- **Reason:** The install/resources directory is typically read-only; user data
+  must go somewhere writable and stable.
+- **Alternatives considered:** Write next to the executable (fails on read-only
+  installs); embed a Python interpreter and run source directly.
+- **Advantages:** Robust on all platforms; clean dev/prod split; no config
+  changes for developers.
+- **Disadvantages:** Packaged path only exercised on a real install.
+- **Impact:** `electron/backend.ts`.
+
+## ADR-0019 - E2E via Playwright against the dev server + live backend
+
+- **Date:** 2026-07-04 (M9)
+- **Decision:** Run end-to-end smoke tests with Playwright (headless Chromium)
+  against the Vite dev server (which proxies to a live backend on the echo
+  provider), orchestrated by Playwright's managed `webServer`s - not full
+  Electron GUI automation.
+- **Reason:** Exercises the real renderer + REST/WebSocket stack deterministically
+  and runs in CI without a display; full Electron GUI automation needs a display
+  and is disproportionately fragile.
+- **Alternatives considered:** Playwright-Electron driver; Spectron (deprecated).
+- **Advantages:** Fast, deterministic, CI-friendly; caught a real WebSocket
+  disconnect bug.
+- **Disadvantages:** Does not cover the Electron shell itself (window/tray).
+- **Impact:** `frontend/playwright.config.ts`, `frontend/e2e/`, CI `e2e` stage.
+
 ## ADR-0018 - In-process plugins with permission-boundary enforcement
 
 - **Date:** 2026-07-04 (M8)

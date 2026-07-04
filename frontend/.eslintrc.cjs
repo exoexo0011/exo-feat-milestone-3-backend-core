@@ -13,7 +13,14 @@ module.exports = {
     'plugin:react-hooks/recommended',
     'prettier',
   ],
-  ignorePatterns: ['dist', 'dist-electron', 'node_modules'],
+  ignorePatterns: [
+    'dist',
+    'dist-electron',
+    'node_modules',
+    'release',
+    'playwright-report',
+    'test-results',
+  ],
   rules: {
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
   },

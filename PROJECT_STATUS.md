@@ -2,17 +2,17 @@
 
 Snapshot dashboard. Regenerated after every milestone.
 
-**Generated:** 2026-07-04 · **Version:** 0.8.0
+**Generated:** 2026-07-04 · **Version:** 0.9.0
 
 ## Summary
 
 | Field | Value |
 |---|---|
-| Current version | 0.8.0 |
-| Current milestone | M8 - Plugin Framework (completed) |
-| Next milestone | M9 - Documentation & packaging |
+| Current version | 0.9.0 |
+| Current milestone | M9 - Documentation & Packaging (completed) |
+| Next milestone | Post-1.0 hardening |
 | Repository health | 🟢 Healthy |
-| Overall completion | ~90% |
+| Overall completion | ~97% (M1–M9 delivered) |
 
 ## Quality gates
 
@@ -23,9 +23,11 @@ Snapshot dashboard. Regenerated after every milestone.
 | Electron compile | 🟢 Pass | `tsc -p electron` clean |
 | Backend tests | 🟢 Pass | 107 passed (pytest) |
 | Frontend tests | 🟢 Pass | 23 passed (vitest, 8 files) |
+| E2E tests | 🟢 Pass | 3 passed (Playwright, headless Chromium) |
 | Lint (ruff / eslint) | 🟢 Pass | backend + frontend clean |
 | Format (black / prettier) | 🟢 Pass | backend + frontend clean |
 | Type check (mypy --strict / tsc) | 🟢 Pass | 56 backend files + frontend, no issues |
+| Installer build | ⚪ Config only | electron-builder + PyInstaller configured; artifact build runs on platform CI |
 | Coverage | ⚪ Not measured | no coverage tool configured (tracked in TODO) |
 
 ## Subsystem progress
@@ -37,8 +39,9 @@ Snapshot dashboard. Regenerated after every milestone.
 | Chat system | 🟢 85% | ChatService, memory/context, REST + WebSocket |
 | Tool system | 🟢 92% | Framework + 13 tools + REST; screenshot backend pending |
 | Plugin system | 🟢 90% | EventBus, manager, lifecycle, SDK, REST; in-process only |
-| Frontend | 🟢 85% | Full chat UI, stores, clients, Electron; plugin UI pending |
-| Documentation | 🟡 70% | Subsystem docs done; api/install/dev-guide pending |
+| Frontend | 🟢 88% | Full chat UI, stores, clients, Electron, E2E; plugin UI pending |
+| Packaging & release | 🟢 90% | PyInstaller + electron-builder + CI release; signing/runners pending |
+| Documentation | 🟢 95% | API, install, dev-guide, migration, subsystem docs complete |
 
 ## Milestones
 
@@ -52,7 +55,7 @@ Snapshot dashboard. Regenerated after every milestone.
 | M6 | Tool framework | ✅ Complete |
 | M7 | Desktop UI & Electron integration | ✅ Complete |
 | M8 | Plugin framework | ✅ Complete |
-| M9 | Documentation & packaging | ⏳ Not started |
+| M9 | Documentation & packaging | ✅ Complete |
 
 ## Test breakdown (backend)
 
@@ -78,6 +81,12 @@ Snapshot dashboard. Regenerated after every milestone.
 | `stores/chatStore.test` | Streaming send flow, empty input, error handling |
 | `stores/settingsStore.test` | Theme + toggle state |
 | `components/*` | Sidebar, MessageInput, SettingsModal, Notifications, MarkdownMessage (copy) |
+
+## Test breakdown (end-to-end, Playwright)
+
+| Spec | Focus |
+|---|---|
+| `e2e/smoke` | App loads; send message → streamed echo reply renders; theme switch |
 
 ## Notable risks / debt
 
