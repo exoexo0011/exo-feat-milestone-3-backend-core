@@ -1,6 +1,6 @@
 [project]
 name = "exo"
-version = "0.6.0"
+version = "0.7.0"
 description = "EXO - modular, production-grade desktop AI assistant"
 requires-python = ">=3.12"
 

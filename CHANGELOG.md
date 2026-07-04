@@ -7,7 +7,65 @@ is a minor release).
 
 ## [Unreleased]
 
-- Milestone 7 (frontend chat UI + Electron backend lifecycle) not yet started.
+- Milestone 8 (plugin system) not yet started.
+
+## [0.7.0] - 2026-07-04 - Milestone 7: Desktop UI & Electron Integration
+
+### Added
+
+- Complete React desktop interface (ChatGPT-style):
+  - Sidebar with conversation history, new-chat, and live search.
+  - Chat window with streaming messages, markdown rendering (GFM), syntax
+    highlighting, and per-block copy-to-clipboard.
+  - Message input with file attachments and drag-and-drop, auto-grow, and a
+    stop-generation control.
+  - Settings modal with Light/Dark/System theme switching and an Enter-to-send
+    toggle.
+  - Toast notification system, typing and tool-execution indicators, loading
+    states, a React error boundary, and keyboard shortcuts
+    (Ctrl/Cmd+N/K/comma, Esc).
+  - Accessibility: ARIA roles/labels, focus management, keyboard navigation.
+- Frontend architecture:
+  - Zustand stores (`chat`, `settings` [persisted], `ui`).
+  - Typed REST client (`api/client.ts`) and WebSocket streaming client
+    (`api/chatSocket.ts`) matching the backend contracts.
+  - Reusable, accessible components and a self-contained inline SVG icon set.
+- Electron integration:
+  - Backend process manager with health-checking and auto-restart (capped).
+  - Secure IPC bridge via a context-isolated preload (`window.exo`).
+  - Native OS notifications, system tray (show/hide/quit), and window-state
+    persistence.
+- Frontend test suite: Vitest + Testing Library (23 tests across client, stores
+  and components) with a jsdom setup.
+
+### Changed
+
+- Package versions aligned to `0.7.0` (backend + frontend).
+- Vite build splits vendor chunks (`react`, `markdown`) and raises the chunk
+  size hint (locally-loaded desktop bundle).
+
+### Fixed
+
+- Eliminated the Vite chunk-size build warning via manual vendor chunking.
+
+### Security
+
+- Electron renderer runs with `contextIsolation`, `sandbox`, and no node
+  integration; all privileged actions go through explicit IPC channels.
+
+### Performance
+
+- Streaming UI updates via incremental token application; memoised markdown
+  rendering; code-split vendor bundles.
+
+### Dependencies
+
+- Added (frontend runtime): `zustand`, `react-markdown`, `remark-gfm`,
+  `rehype-highlight`, `highlight.js`.
+- Added (frontend dev): `vitest`, `@testing-library/react`,
+  `@testing-library/user-event`, `@testing-library/jest-dom`, `jsdom`.
+- Evaluated and rejected `lucide-react` (version anomaly for the environment);
+  replaced with an inline SVG icon set.
 
 ## [0.6.0] - 2026-07-04 - Milestone 6: Tool Framework
 
@@ -138,7 +196,8 @@ is a minor release).
 - FastAPI app factory, `/api/health` endpoint, and the frontend skeleton shell
   verifying the full stack.
 
-[Unreleased]: https://gitlab.com/exo-group9325627/exo/-/compare/v0.6.0...HEAD
+[Unreleased]: https://gitlab.com/exo-group9325627/exo/-/compare/v0.7.0...HEAD
+[0.7.0]: https://gitlab.com/exo-group9325627/exo/-/releases/v0.7.0
 [0.6.0]: https://gitlab.com/exo-group9325627/exo/-/releases/v0.6.0
 [0.5.0]: https://gitlab.com/exo-group9325627/exo/-/releases/v0.5.0
 [0.4.0]: https://gitlab.com/exo-group9325627/exo/-/releases/v0.4.0

@@ -11,10 +11,10 @@ extensibility via plugins.
 
 ## Status
 
-- **Current version:** 0.6.0
-- **Current milestone:** Milestone 6 - Tool Framework (completed)
-- **Next milestone:** Milestone 7 - Frontend chat UI + Electron backend lifecycle
-- **Estimated overall completion:** ~68%
+- **Current version:** 0.7.0
+- **Current milestone:** Milestone 7 - Desktop UI & Electron Integration (completed)
+- **Next milestone:** Milestone 8 - Plugin system
+- **Estimated overall completion:** ~82%
 
 ## Completed milestones
 
@@ -30,21 +30,25 @@ extensibility via plugins.
   REST chat endpoints, WebSocket streaming.
 - [x] **M6 - Tool framework:** BaseTool, registry, permissions, sandbox,
   confirmation, execution engine, history, 13 built-in tools, tools REST API.
+- [x] **M7 - Desktop UI & Electron:** full React chat UI (sidebar/history/search,
+  streaming, markdown + syntax highlighting + copy, attachments + drag-drop,
+  settings, theme switching, notifications, indicators, shortcuts, a11y),
+  Zustand stores, typed REST + WebSocket clients, and Electron integration
+  (backend process manager + auto-restart, secure IPC, native notifications,
+  system tray, window-state persistence). Vitest test suite.
 
 ## In progress
 
-- [ ] None (M6 complete; awaiting review before M7).
+- [ ] None (M7 complete; awaiting review before M8).
 
 ## Remaining milestones
 
-- [ ] **M7 - Frontend & desktop:** real chat UI (sidebar, history, settings,
-  markdown), Zustand stores, typed REST client + WebSocket hook, tool
-  confirmation UI, and Electron backend lifecycle (spawn/manage the Python
-  server in packaged builds).
 - [ ] **M8 - Plugin system:** `PluginManager`, manifest validation, capability
   scoping, plugin-contributed tools/routes discovered at startup.
 - [ ] **M9 - Documentation & packaging:** `docs/api.md`, `docs/installation.md`,
-  `docs/developer-guide.md`, installers, release pipeline.
+  `docs/developer-guide.md`, installers, release pipeline, real E2E tests.
+- [ ] **Chat tool-calling loop:** let the model invoke tools during a chat turn
+  and stream `tool` events to the (already built) UI indicators.
 
 > Note: milestone numbering follows the delivery order agreed in this project.
 > The plugin system (originally referenced as "Milestone 6" in early notes) is
@@ -80,11 +84,16 @@ extensibility via plugins.
 
 ## Known limitations
 
-- Frontend is a placeholder shell; no real chat UI yet.
 - `screenshot` tool has no default capture backend (reports "unavailable").
 - Clipboard/launch tools depend on platform CLIs/allow-lists and are unverified
   in headless CI (covered by unit tests via injected backends).
 - Single local user profile only.
+- Tool-execution UI indicators exist but the backend does not yet emit `tool`
+  stream events (arrives with the chat tool-calling loop).
+- Electron packaged flow (backend spawn, tray icon asset, real E2E) is
+  implemented and compiles but is not exercised in this headless environment.
+- File attachments are folded into the message text (text files only); binary
+  files are noted but not uploaded.
 
 ## Completion by area
 
@@ -95,6 +104,6 @@ extensibility via plugins.
 | Chat system | 85% |
 | Tool system | 90% |
 | Plugin system | 0% |
-| Frontend | 10% |
-| Documentation | 60% |
-| **Overall** | **~68%** |
+| Frontend | 85% |
+| Documentation | 65% |
+| **Overall** | **~82%** |

@@ -6,33 +6,31 @@ Medium (important, not blocking), Low (nice-to-have / hygiene).
 
 ## High Priority
 
-- **Frontend chat UI** — Build the real chat interface (message list, input,
-  sidebar, streaming rendering) consuming `/api/chat` and `/ws/chat`.
-  Status: Not started · Priority: High · Milestone: M7
-- **Typed API client + WebSocket hook** — Frontend REST client and streaming
-  hook with shared TypeScript types.
-  Status: Not started · Priority: High · Milestone: M7
-- **Tool confirmation UI** — Surface `confirmation_required` results and wire
-  confirm/deny to the tools API.
-  Status: Not started · Priority: High · Milestone: M7
-- **Electron backend lifecycle** — Spawn and manage the Python backend in
-  packaged builds; health-gate the renderer.
-  Status: Not started · Priority: High · Milestone: M7
+- **Plugin system (M8)** — `PluginManager`, manifest validation, capability
+  scoping, and plugin-contributed tools/routes discovered at startup.
+  Status: Not started · Priority: High · Milestone: M8
+- **Chat tool-calling loop** — Let the model request tool execution mid-chat,
+  stream `tool` events to the UI (indicators already built), and feed results
+  back into the turn.
+  Status: Not started · Priority: High · Milestone: M8
 
 ## Medium Priority
 
 - **Database migrations (Alembic)** — Replace `create_all` with migrations
   before any schema change ships to existing databases.
   Status: Not started · Priority: Medium · Milestone: Tech debt
-- **Test coverage tooling** — Add `pytest-cov`, report coverage, and set a CI
-  threshold.
+- **Test coverage tooling** — Add `pytest-cov` (backend) and Vitest coverage
+  (frontend); set CI thresholds.
   Status: Not started · Priority: Medium · Milestone: Tech debt
-- **Tool-calling loop** — Let the model request tool execution mid-chat and feed
-  results back.
-  Status: Not started · Priority: Medium · Milestone: M7/M8
+- **End-to-end tests** — Playwright/Electron E2E for the packaged desktop flow
+  (needs a display; not runnable headless here).
+  Status: Not started · Priority: Medium · Milestone: M9
 - **Screenshot capture backend** — Provide a real cross-platform capture backend
   (e.g. mss/Pillow) behind the existing `Screenshotter` abstraction.
   Status: Not started · Priority: Medium · Milestone: Future
+- **Tray icon asset + real notifications wiring** — Ship a tray icon and connect
+  in-app notifications to native ones where appropriate.
+  Status: Not started · Priority: Medium · Milestone: M9
 
 ## Low Priority
 
@@ -47,6 +45,18 @@ Medium (important, not blocking), Low (nice-to-have / hygiene).
 
 ## Completed
 
+- **Desktop UI (M7)** — Full React chat interface: sidebar/history/search,
+  streaming, markdown + syntax highlighting + copy, attachments + drag-drop,
+  settings, theme switching, notifications, indicators, shortcuts, a11y.
+  Status: Done · Priority: High · Milestone: M7
+- **Frontend architecture (M7)** — Zustand stores, typed REST client, WebSocket
+  streaming client, reusable components, inline SVG icons.
+  Status: Done · Priority: High · Milestone: M7
+- **Electron integration (M7)** — Backend process manager + auto-restart, secure
+  IPC bridge, native notifications, system tray, window-state persistence.
+  Status: Done · Priority: High · Milestone: M7
+- **Frontend test suite (M7)** — Vitest + Testing Library (23 tests).
+  Status: Done · Priority: High · Milestone: M7
 - **Tool framework + 13 built-in tools** — BaseTool, registry, permissions,
   sandbox, confirmation, engine, history, tools REST API.
   Status: Done · Priority: High · Milestone: M6

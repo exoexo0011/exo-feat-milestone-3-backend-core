@@ -4,7 +4,7 @@ Living architecture document, kept in sync with the codebase. High-level
 overview lives here; subsystem detail is in `docs/` (`ai-providers.md`,
 `chat.md`, `tools.md`).
 
-**Version:** 0.6.0 · **Last updated:** 2026-07-04 (Milestone 6)
+**Version:** 0.7.0 · **Last updated:** 2026-07-04 (Milestone 7)
 
 ## 1. System overview
 
@@ -21,8 +21,8 @@ EXO is a local client/server desktop application.
 ```
 
 - **Frontend:** Electron shell (contextIsolation on, sandbox on, no node
-  integration) hosting a React + TypeScript + Tailwind renderer. Currently a
-  skeleton shell (M7 builds the real UI).
+  integration) hosting a React + TypeScript + Tailwind renderer with a full
+  ChatGPT-style UI, Zustand state, and typed REST/WebSocket clients (see §10).
 - **Backend:** FastAPI on localhost exposing REST + WebSocket APIs.
 - **Storage:** SQLite via SQLAlchemy async (conversations, messages, profiles,
   preferences, system events, assistant/tool actions).
@@ -144,3 +144,75 @@ compiles to CommonJS.
 
 See `KNOWN_ISSUES.md` and `ROADMAP.md` (technical debt): no migrations, no auth,
 no coverage tooling, catch-all exception handler pending.
+
+## 10. Frontend architecture (renderer)
+
+```
+frontend/src/
+├── types/        api.ts (backend contracts), electron.ts (bridge), global.d.ts
+├── api/          client.ts (typed REST), chatSocket.ts (WebSocket streaming)
+├── stores/       Zustand: chatStore, settingsStore (persisted), uiStore
+├── hooks/        useTheme, useKeyboardShortcuts
+├── lib/          cx (classnames)
+├── components/
+│   ├── common/   Button, IconButton, Spinner, Notifications, ErrorBoundary
+│   ├── sidebar/  Sidebar (history + search + new chat)
+│   ├── settings/ SettingsModal (theme, send-on-enter)
+│   ├── chat/     ChatWindow, MessageList, MessageItem, MarkdownMessage,
+│   │             CodeBlock (copy), MessageInput (attachments+drag/drop),
+│   │             ToolIndicator
+│   └── icons.tsx inline SVG icon set
+├── App.tsx       shell layout + lifecycle wiring
+└── main.tsx      entry (ErrorBoundary + StrictMode, hljs theme)
+```
+
+Principles:
+
+- **State:** three focused Zustand stores. `settingsStore` is persisted to
+  `localStorage`. Components subscribe to slices to minimise re-renders.
+- **Data:** the renderer uses relative URLs (`/api`, `/ws`) so the Vite proxy
+  (dev) and the packaged app both reach the local backend. `ApiError` carries
+  the backend `detail`.
+- **Streaming:** `chatStore.sendMessage` opens a per-turn WebSocket via
+  `streamChat`, applies token deltas to `streaming`, and appends the persisted
+  message on `done`. The socket constructor is injectable for testing.
+- **Rendering:** assistant markdown via `react-markdown` + `remark-gfm` +
+  `rehype-highlight`; fenced code blocks get a copy button.
+- **Accessibility:** ARIA roles/labels, `aria-live` regions for messages and
+  toasts, a radiogroup for theme, focus management on the settings dialog,
+  and global keyboard shortcuts.
+
+### Frontend data flow (send a message)
+
+1. `MessageInput` composes text (+ attachments) and calls `chatStore.sendMessage`.
+2. The store optimistically appends the user message and opens `streamChat`.
+3. `token` events append to `streaming.content` (rendered live in `MessageList`).
+4. `done` appends the persisted assistant message and refreshes the sidebar;
+   `error` raises a toast and clears streaming.
+
+## 11. Electron integration
+
+```
+frontend/electron/
+├── main.ts         app lifecycle, window, IPC, tray, notifications
+├── preload.ts      secure contextBridge -> window.exo
+├── backend.ts      BackendManager: spawn + health-check + auto-restart
+├── tray.ts         system tray (show/hide/quit)
+└── windowState.ts  persist/restore window bounds (userData JSON)
+```
+
+- **Security:** `contextIsolation: true`, `sandbox: true`, `nodeIntegration:
+  false`. The renderer only sees the minimal typed `window.exo` bridge.
+- **Backend lifecycle:** in packaged builds `BackendManager` spawns
+  `uvicorn app.main:app`, polls `/api/health` until ready, auto-restarts on
+  crash (capped at 5, with backoff), and reports phase (`starting`/`ready`/
+  `error`/`stopped`) to the renderer over the `backend:status` channel. In dev
+  the backend is run separately and the main process reports `ready`.
+- **IPC channels:** `backend:status` (main→renderer), `backend:getStatus`
+  (invoke), `notify` (renderer→main native notification).
+- **Windowing:** closing hides to the system tray; bounds are persisted and
+  restored across launches.
+
+> The Electron layer compiles cleanly (`tsc -p electron`) but its runtime
+> (process spawn, tray, packaging) is not exercised in the headless CI
+> environment; real end-to-end coverage is scheduled for M9.

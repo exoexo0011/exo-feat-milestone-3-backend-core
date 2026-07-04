@@ -1,42 +1,43 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
-interface HealthResponse {
-  status: string;
-  version: string;
-  env: string;
-}
+import { ChatWindow } from '@/components/chat/ChatWindow';
+import { Notifications } from '@/components/common/Notifications';
+import { SettingsModal } from '@/components/settings/SettingsModal';
+import { Sidebar } from '@/components/sidebar/Sidebar';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { useTheme } from '@/hooks/useTheme';
+import { useChatStore } from '@/stores/chatStore';
+import { useUiStore } from '@/stores/uiStore';
 
-/**
- * Milestone 2 placeholder shell.
- * Verifies the full stack (Vite → proxy → FastAPI) is wired correctly.
- * The real chat UI (sidebar, history, settings) lands in Milestone 7.
- */
 export default function App() {
-  const [health, setHealth] = useState<HealthResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  useTheme();
+  useKeyboardShortcuts();
 
   useEffect(() => {
-    fetch('/api/health')
-      .then((res) => res.json() as Promise<HealthResponse>)
-      .then(setHealth)
-      .catch(() => setError('Backend not reachable'));
+    void useChatStore.getState().init();
+  }, []);
+
+  // React to the Electron-managed backend lifecycle when running in the shell.
+  useEffect(() => {
+    const bridge = window.exo;
+    if (!bridge) {
+      return;
+    }
+    return bridge.onBackendStatus((status) => {
+      if (status.phase === 'ready') {
+        void useChatStore.getState().init();
+      } else if (status.phase === 'error') {
+        useUiStore.getState().notify('error', status.detail ?? 'The backend failed to start.');
+      }
+    });
   }, []);
 
   return (
-    <div className="flex h-screen items-center justify-center bg-surface-dark text-gray-100">
-      <div className="rounded-xl bg-panel-dark p-8 text-center shadow-lg">
-        <h1 className="mb-2 text-3xl font-bold text-accent">EXO</h1>
-        <p className="text-sm text-gray-400">AI Desktop Assistant — skeleton build</p>
-        <p className="mt-4 text-xs">
-          {health && (
-            <span className="text-green-400">
-              Backend online · v{health.version} · {health.env}
-            </span>
-          )}
-          {error && <span className="text-red-400">{error}</span>}
-          {!health && !error && <span className="text-gray-500">Checking backend…</span>}
-        </p>
-      </div>
+    <div className="flex h-screen w-screen overflow-hidden bg-surface text-gray-900 dark:bg-surface-dark dark:text-gray-100">
+      <Sidebar />
+      <ChatWindow />
+      <SettingsModal />
+      <Notifications />
     </div>
   );
 }

@@ -5,6 +5,33 @@ Severity: Critical / High / Medium / Low.
 
 ## Open
 
+### ISSUE-008 - Tool-execution indicators have no backend events yet
+- **Severity:** Low
+- **Status:** Open
+- **Description:** The UI renders `tool` stream events (indicators), but the chat
+  WebSocket does not emit them yet; tools are not invoked during a chat turn.
+- **Workaround:** Use the `/api/tools` endpoints directly.
+- **Planned fix:** Chat tool-calling loop (M8).
+
+### ISSUE-007 - Electron runtime not exercised headlessly
+- **Severity:** Low
+- **Status:** Open
+- **Description:** The Electron main/preload compile cleanly, but process spawn,
+  system tray, native notifications, and packaging are not run in this headless
+  environment, and there is no automated end-to-end test.
+- **Workaround:** Manual verification on a desktop; component/integration tests
+  cover the renderer.
+- **Planned fix:** Playwright/Electron E2E and a real tray icon asset (M9).
+
+### ISSUE-006 - File attachments are text-only and inlined
+- **Severity:** Low
+- **Status:** Open
+- **Description:** Attached files are folded into the message text (text files
+  only, ≤100 KB); binary files are noted but not uploaded, since the chat API
+  accepts text content only.
+- **Workaround:** Paste relevant text; attach small text files.
+- **Planned fix:** A dedicated attachment/upload channel if needed later.
+
 ### ISSUE-005 - No authentication on REST/WebSocket surface
 - **Severity:** High (only when exposed beyond localhost)
 - **Status:** Open (by design for local-first Phase 1)

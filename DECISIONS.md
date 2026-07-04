@@ -4,6 +4,68 @@ Chronological record of significant technical decisions. Newest first.
 
 ---
 
+## ADR-0014 - Per-turn WebSocket for streaming
+
+- **Date:** 2026-07-04 (M7)
+- **Decision:** Open a fresh WebSocket per chat turn (`streamChat`) rather than a
+  persistent socket; inject the `WebSocket` constructor for testing.
+- **Reason:** Matches the backend's per-message WS protocol, simplifies lifecycle
+  and cancellation, and keeps the client stateless between turns.
+- **Alternatives considered:** One long-lived socket with request multiplexing.
+- **Advantages:** Simple, cancellable, testable without a server.
+- **Disadvantages:** Reconnect cost per turn (negligible on localhost).
+- **Impact:** `api/chatSocket.ts`, `chatStore`.
+
+## ADR-0013 - Replace lucide-react with an inline SVG icon set
+
+- **Date:** 2026-07-04 (M7)
+- **Decision:** Do not depend on an icon package; ship a small inline SVG set.
+- **Reason:** The resolved `lucide-react@1.x` was a version anomaly for this
+  environment; avoiding the dependency removes supply-chain risk and shrinks the
+  bundle.
+- **Alternatives considered:** Pin a specific lucide version; use a different
+  icon library.
+- **Advantages:** Zero icon dependency, fully controlled, smaller bundle.
+- **Disadvantages:** We maintain the icons ourselves (a handful).
+- **Impact:** `components/icons.tsx`.
+
+## ADR-0012 - Markdown rendering via react-markdown + rehype-highlight
+
+- **Date:** 2026-07-04 (M7)
+- **Decision:** Render assistant markdown with `react-markdown` + `remark-gfm` +
+  `rehype-highlight`; override the code renderer to add a copy button.
+- **Reason:** Safe (no `dangerouslySetInnerHTML`), GFM support, and CSS-class
+  highlighting without a heavy syntax-highlighter component.
+- **Alternatives considered:** `react-syntax-highlighter` (heavier), a custom
+  markdown parser.
+- **Advantages:** Safe, composable, lighter; copy button integrates cleanly.
+- **Disadvantages:** Highlight bundle size (mitigated by vendor chunking).
+- **Impact:** `components/chat/MarkdownMessage.tsx`, `CodeBlock.tsx`, build config.
+
+## ADR-0011 - Electron owns the backend only in packaged builds; hide-to-tray
+
+- **Date:** 2026-07-04 (M7)
+- **Decision:** `BackendManager` spawns/health-checks/auto-restarts the backend
+  in packaged builds; in dev the backend runs separately. Closing the window
+  hides to the system tray instead of quitting.
+- **Reason:** Avoid double-spawning during development; provide a desktop-native
+  always-available assistant.
+- **Alternatives considered:** Always spawn; quit on window close.
+- **Advantages:** Clean dev workflow; resilient backend; native UX.
+- **Disadvantages:** Tray/packaging paths are not exercised headlessly.
+- **Impact:** `electron/main.ts`, `electron/backend.ts`, `electron/tray.ts`.
+
+## ADR-0010 - Secure IPC bridge (`window.exo`)
+
+- **Date:** 2026-07-04 (M7)
+- **Decision:** Expose only a minimal, typed API to the renderer via a
+  context-isolated preload; all privileged actions use explicit IPC channels.
+- **Reason:** Security — the renderer must never get direct Node/Electron access.
+- **Alternatives considered:** `nodeIntegration: true` (unsafe).
+- **Advantages:** Strong renderer isolation; typed, auditable surface.
+- **Disadvantages:** Every capability needs an explicit channel.
+- **Impact:** `electron/preload.ts`, `types/electron.ts`, `main.ts` IPC handlers.
+
 ## ADR-0009 - Adopt project-management documents as source
 
 - **Date:** 2026-07-04 (M6)
