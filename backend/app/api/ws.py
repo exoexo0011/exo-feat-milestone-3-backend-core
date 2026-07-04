@@ -32,7 +32,9 @@ async def chat_ws(websocket: WebSocket, session: DbSession) -> None:
     """Stream assistant replies token-by-token over a WebSocket."""
     await websocket.accept()
     provider: AIProvider = websocket.app.state.ai_provider
-    chat_service = build_chat_service(session, provider, get_settings())
+    chat_service = build_chat_service(
+        session, provider, get_settings(), websocket.app.state.event_bus
+    )
 
     try:
         while True:

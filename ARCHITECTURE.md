@@ -4,7 +4,7 @@ Living architecture document, kept in sync with the codebase. High-level
 overview lives here; subsystem detail is in `docs/` (`ai-providers.md`,
 `chat.md`, `tools.md`).
 
-**Version:** 0.7.0 · **Last updated:** 2026-07-04 (Milestone 7)
+**Version:** 0.8.0 · **Last updated:** 2026-07-04 (Milestone 8)
 
 ## 1. System overview
 
@@ -65,6 +65,8 @@ Principles:
 | `app/services/chat.py` | `ChatService` (persist → context → provider → persist) |
 | `app/services/memory.py` | `MemoryService` (system prompt + recency window) |
 | `app/services/tools/` | Tool framework + `builtins/` (13 tools) |
+| `app/services/eventbus.py` | In-process pub/sub `EventBus` + event names |
+| `app/services/plugins/` | Plugin manifest, context, registry, loader, manager, SDK |
 
 ## 4. Data flow
 
@@ -216,3 +218,49 @@ frontend/electron/
 > The Electron layer compiles cleanly (`tsc -p electron`) but its runtime
 > (process spawn, tray, packaging) is not exercised in the headless CI
 > environment; real end-to-end coverage is scheduled for M9.
+
+## 12. Event system & plugin framework
+
+```
+app/services/
+├── eventbus.py           EventBus (pub/sub, error-isolated), EventName
+└── plugins/
+    ├── manifest.py       PluginManifest, PluginPermission, version helpers
+    ├── context.py        PluginContext (DI) + PluginRegistration + descriptors
+    ├── registry.py       PluginRegistry, PluginRecord, PluginState
+    ├── loader.py         discovery + safe importlib loading
+    ├── manager.py        PluginManager (lifecycle + integration)
+    ├── sdk.py            stable import surface for plugin authors
+    └── errors.py         plugin error hierarchy
+```
+
+- **EventBus** decouples producers (chat, tools, plugin lifecycle, system) from
+  consumers (plugins). Handlers may be sync or async; exceptions are isolated so
+  one subscriber cannot affect the publisher or siblings. It is created once in
+  the lifespan and shared via `app.state.event_bus`. `ChatService` and
+  `ToolExecutionEngine` publish events when a bus is injected.
+- **PluginManager** (created in the lifespan when `plugins_enabled`) discovers
+  plugin directories under `plugins_dir`, validates manifests, orders by
+  dependencies, checks `min_exo_version`, imports each package under a unique
+  module name, and calls `register(context)`. Plugin contributions are recorded
+  (not applied) during `register`; the manager **applies** them on enable
+  (register tools into the `ToolRegistry`, subscribe events, add commands, mount
+  routers, run startup hooks) and **reverts** them on disable.
+- **Isolation:** every plugin operation is wrapped - an import/register/hook
+  failure marks the plugin `error` and never propagates. Permissions are
+  enforced at the `PluginContext` boundary; plugins run in-process (no OS
+  sandbox - see KNOWN_ISSUES).
+- **Surface:** plugins can register tools, commands, API routers, WebSocket
+  handlers, settings pages, UI panels, startup/shutdown hooks, and event
+  subscriptions. Exposed via `/api/plugins` (list/get/enable/disable/reload/
+  commands/settings-pages/ui-panels).
+
+### Plugin lifecycle
+
+```
+discovered ──load──► enabled ──disable──► disabled ──enable──► enabled
+     │                  │                                        
+     └─ manifest/       └─ (reload) unload module + re-register  
+        version/dep         
+        failure ─────────► error
+```

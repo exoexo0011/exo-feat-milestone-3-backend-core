@@ -23,6 +23,7 @@ from pydantic import ValidationError
 
 from app.models import ActionStatus
 from app.repositories.events import EventRepository
+from app.services.eventbus import EventBus, EventName
 from app.services.tools.base import (
     BaseTool,
     ToolContext,
@@ -46,10 +47,12 @@ class ToolExecutionEngine:
         policy: PermissionPolicy,
         *,
         events: EventRepository | None = None,
+        event_bus: EventBus | None = None,
     ) -> None:
         self._registry = registry
         self._policy = policy
         self._events = events
+        self._event_bus = event_bus
 
     async def execute(
         self,
@@ -138,12 +141,14 @@ class ToolExecutionEngine:
             output = await tool.run(params, ctx)
         except ToolError as exc:
             await self._finish(action_id, ActionStatus.FAILED, {"error": exc.message})
+            await self._emit_executed(tool.name, ToolStatus.FAILED)
             return ToolResult(
                 tool=tool.name, status=ToolStatus.FAILED, error=exc.message, action_id=action_id
             )
         except Exception:
             logger.exception("Unhandled error while executing tool '%s'", tool.name)
             await self._finish(action_id, ActionStatus.FAILED, {"error": "internal error"})
+            await self._emit_executed(tool.name, ToolStatus.FAILED)
             return ToolResult(
                 tool=tool.name,
                 status=ToolStatus.FAILED,
@@ -151,9 +156,14 @@ class ToolExecutionEngine:
                 action_id=action_id,
             )
         await self._finish(action_id, ActionStatus.COMPLETED, output)
+        await self._emit_executed(tool.name, ToolStatus.COMPLETED)
         return ToolResult(
             tool=tool.name, status=ToolStatus.COMPLETED, output=output, action_id=action_id
         )
+
+    async def _emit_executed(self, tool: str, status: ToolStatus) -> None:
+        if self._event_bus is not None:
+            await self._event_bus.emit(EventName.TOOL_EXECUTED, tool=tool, status=status.value)
 
     async def _record_pending(
         self,

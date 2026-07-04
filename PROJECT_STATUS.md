@@ -2,17 +2,17 @@
 
 Snapshot dashboard. Regenerated after every milestone.
 
-**Generated:** 2026-07-04 · **Version:** 0.7.0
+**Generated:** 2026-07-04 · **Version:** 0.8.0
 
 ## Summary
 
 | Field | Value |
 |---|---|
-| Current version | 0.7.0 |
-| Current milestone | M7 - Desktop UI & Electron (completed) |
-| Next milestone | M8 - Plugin system |
+| Current version | 0.8.0 |
+| Current milestone | M8 - Plugin Framework (completed) |
+| Next milestone | M9 - Documentation & packaging |
 | Repository health | 🟢 Healthy |
-| Overall completion | ~82% |
+| Overall completion | ~90% |
 
 ## Quality gates
 
@@ -21,11 +21,11 @@ Snapshot dashboard. Regenerated after every milestone.
 | Backend build | 🟢 Pass | App factory + lifespan import cleanly |
 | Frontend build | 🟢 Pass | `vite build`, no warnings (vendor-chunked) |
 | Electron compile | 🟢 Pass | `tsc -p electron` clean |
-| Backend tests | 🟢 Pass | 77 passed (pytest) |
+| Backend tests | 🟢 Pass | 107 passed (pytest) |
 | Frontend tests | 🟢 Pass | 23 passed (vitest, 8 files) |
 | Lint (ruff / eslint) | 🟢 Pass | backend + frontend clean |
 | Format (black / prettier) | 🟢 Pass | backend + frontend clean |
-| Type check (mypy --strict / tsc) | 🟢 Pass | 55 backend files + frontend, no issues |
+| Type check (mypy --strict / tsc) | 🟢 Pass | 56 backend files + frontend, no issues |
 | Coverage | ⚪ Not measured | no coverage tool configured (tracked in TODO) |
 
 ## Subsystem progress
@@ -35,10 +35,10 @@ Snapshot dashboard. Regenerated after every milestone.
 | Backend core | 🟢 95% | Models, repositories, schemas, DB, config, logging |
 | AI system | 🟢 90% | Interface, factory, Echo/OpenAI/Anthropic, streaming |
 | Chat system | 🟢 85% | ChatService, memory/context, REST + WebSocket |
-| Tool system | 🟢 90% | Framework + 13 tools + REST; screenshot backend pending |
-| Plugin system | 🔴 0% | Not started (M8) |
-| Frontend | 🟢 85% | Full chat UI, stores, clients, Electron; tool-calling loop pending |
-| Documentation | 🟡 65% | Subsystem docs done; api/install/dev-guide pending |
+| Tool system | 🟢 92% | Framework + 13 tools + REST; screenshot backend pending |
+| Plugin system | 🟢 90% | EventBus, manager, lifecycle, SDK, REST; in-process only |
+| Frontend | 🟢 85% | Full chat UI, stores, clients, Electron; plugin UI pending |
+| Documentation | 🟡 70% | Subsystem docs done; api/install/dev-guide pending |
 
 ## Milestones
 
@@ -51,7 +51,7 @@ Snapshot dashboard. Regenerated after every milestone.
 | M5 | Chat pipeline | ✅ Complete |
 | M6 | Tool framework | ✅ Complete |
 | M7 | Desktop UI & Electron integration | ✅ Complete |
-| M8 | Plugin system | ⏳ Not started |
+| M8 | Plugin framework | ✅ Complete |
 | M9 | Documentation & packaging | ⏳ Not started |
 
 ## Test breakdown (backend)
@@ -65,6 +65,10 @@ Snapshot dashboard. Regenerated after every milestone.
 | `test_tools_builtin` | Each built-in tool |
 | `test_tools_framework` | Registry, permissions, sandbox, engine |
 | `test_tools_api` | Tools REST (execute/confirm/deny/history) |
+| `test_eventbus` | Pub/sub, wildcard, async/sync, error isolation |
+| `test_plugin_manifest` | Manifest validation + version compatibility |
+| `test_plugins` | Manager lifecycle, isolation, security, dependencies |
+| `test_plugins_api` | Plugins REST + example plugin integration |
 
 ## Test breakdown (frontend, vitest)
 

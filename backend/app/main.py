@@ -7,6 +7,7 @@ Shutdown: dispose the database engine.
 import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -19,6 +20,8 @@ from app.core.exceptions import register_exception_handlers
 from app.db.session import dispose_db, init_db
 from app.logging_config import setup_logging
 from app.services.ai import ProviderFactory
+from app.services.eventbus import EventBus, EventName
+from app.services.plugins import PluginManager
 from app.services.tools import PermissionPolicy, build_default_registry
 
 logger = logging.getLogger("exo.app")
@@ -38,14 +41,35 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # shared across requests (the per-request engine binds them to a session).
     app.state.tool_registry = build_default_registry(settings)
     app.state.permission_policy = PermissionPolicy.from_settings(settings)
+
+    # Event bus + plugin manager.
+    event_bus = EventBus()
+    app.state.event_bus = event_bus
+    plugin_manager: PluginManager | None = None
+    if settings.plugins_enabled:
+        plugin_manager = PluginManager(
+            Path(settings.plugins_dir).expanduser(),
+            tool_registry=app.state.tool_registry,
+            event_bus=event_bus,
+            exo_version=__version__,
+            app=app,
+        )
+        await plugin_manager.discover_and_load()
+    app.state.plugin_manager = plugin_manager
+
+    await event_bus.emit(EventName.SYSTEM_STARTUP, version=__version__)
     logger.info(
-        "EXO backend %s started (env=%s, ai_provider=%s, tools=%d)",
+        "EXO backend %s started (env=%s, ai_provider=%s, tools=%d, plugins=%d)",
         __version__,
         settings.env,
         settings.ai_provider,
         len(app.state.tool_registry),
+        len(plugin_manager.registry.all()) if plugin_manager else 0,
     )
     yield
+    await event_bus.emit(EventName.SYSTEM_SHUTDOWN)
+    if plugin_manager is not None:
+        await plugin_manager.shutdown()
     await provider.aclose()
     await dispose_db()
     logger.info("EXO backend stopped")

@@ -7,7 +7,51 @@ is a minor release).
 
 ## [Unreleased]
 
-- Milestone 8 (plugin system) not yet started.
+- Milestone 9 (documentation & packaging) and the chat tool-calling loop not yet started.
+
+## [0.8.0] - 2026-07-04 - Milestone 8: Plugin Framework
+
+### Added
+
+- Event system: an in-process `EventBus` (pub/sub) with sync/async handlers,
+  wildcard subscription, and per-handler error isolation. Event names for
+  system, plugin lifecycle, chat and tool events.
+- Plugin framework (`app/services/plugins/`):
+  - `PluginManifest` (validated `plugin.json`) with name/version/author/
+    description, permissions, dependencies, `min_exo_version`, entry point.
+  - `PluginPermission` set: filesystem read/write, clipboard, network,
+    notifications, tool access, settings access.
+  - `PluginContext` (dependency injection) with permission-gated registration of
+    tools, commands, API routers, WebSocket handlers, settings pages, UI panels,
+    startup/shutdown hooks, and event subscriptions.
+  - `PluginRegistry` + `PluginRecord` lifecycle states; `PluginLoader`
+    (discovery, safe importlib loading under unique module names); `PluginManager`
+    (dependency ordering, version compatibility, enable/disable/reload, hooks).
+  - Plugin SDK (`app/services/plugins/sdk.py`) as the stable author surface.
+- Plugins REST API under `/api/plugins` (list, get, enable, disable, reload,
+  commands, execute command, settings-pages, ui-panels).
+- Event emission wired into `ChatService` (chat events) and
+  `ToolExecutionEngine` (tool events); `system.startup`/`system.shutdown` from
+  the app lifespan.
+- Reference plugin `plugins/hello_exo/` (tool + command + event subscriber +
+  settings page + UI panel + hooks) and `docs/plugins.md` development guide.
+- Settings: `plugins_enabled`, `plugins_dir`.
+- `ToolRegistry.unregister`, `EventRepository.get_action`/`list_actions`
+  (added earlier) supporting plugin/tool teardown and history.
+
+### Changed
+
+- Package versions aligned to `0.8.0` (backend + frontend).
+- `ChatService` and `ToolExecutionEngine` accept an optional `event_bus`
+  (backward compatible; default `None`).
+
+### Security
+
+- Plugin capabilities are validated and enforced at the `PluginContext`
+  boundary; plugin tools must hold permissions matching their tool capabilities.
+- Plugin load/register/hook failures are isolated - a bad plugin cannot crash
+  the app or affect other plugins.
+- Documented limitation: plugins run in-process (no true OS sandbox).
 
 ## [0.7.0] - 2026-07-04 - Milestone 7: Desktop UI & Electron Integration
 
@@ -196,7 +240,8 @@ is a minor release).
 - FastAPI app factory, `/api/health` endpoint, and the frontend skeleton shell
   verifying the full stack.
 
-[Unreleased]: https://gitlab.com/exo-group9325627/exo/-/compare/v0.7.0...HEAD
+[Unreleased]: https://gitlab.com/exo-group9325627/exo/-/compare/v0.8.0...HEAD
+[0.8.0]: https://gitlab.com/exo-group9325627/exo/-/releases/v0.8.0
 [0.7.0]: https://gitlab.com/exo-group9325627/exo/-/releases/v0.7.0
 [0.6.0]: https://gitlab.com/exo-group9325627/exo/-/releases/v0.6.0
 [0.5.0]: https://gitlab.com/exo-group9325627/exo/-/releases/v0.5.0

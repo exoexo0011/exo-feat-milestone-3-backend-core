@@ -6,13 +6,13 @@ Medium (important, not blocking), Low (nice-to-have / hygiene).
 
 ## High Priority
 
-- **Plugin system (M8)** — `PluginManager`, manifest validation, capability
-  scoping, and plugin-contributed tools/routes discovered at startup.
-  Status: Not started · Priority: High · Milestone: M8
 - **Chat tool-calling loop** — Let the model request tool execution mid-chat,
   stream `tool` events to the UI (indicators already built), and feed results
   back into the turn.
-  Status: Not started · Priority: High · Milestone: M8
+  Status: Not started · Priority: High · Milestone: M9
+- **Documentation & packaging (M9)** — `docs/api.md`, `docs/installation.md`,
+  `docs/developer-guide.md`; desktop installers and release pipeline.
+  Status: Not started · Priority: High · Milestone: M9
 
 ## Medium Priority
 
@@ -31,6 +31,12 @@ Medium (important, not blocking), Low (nice-to-have / hygiene).
 - **Tray icon asset + real notifications wiring** — Ship a tray icon and connect
   in-app notifications to native ones where appropriate.
   Status: Not started · Priority: Medium · Milestone: M9
+- **Plugin isolation hardening** — Subprocess/WASM sandbox for true isolation;
+  persist plugin settings; tear down routes on disable.
+  Status: Not started · Priority: Medium · Milestone: Future
+- **Frontend plugin UI** — Render plugin-contributed settings pages / UI panels
+  and expose enable/disable in the app.
+  Status: Not started · Priority: Medium · Milestone: M9
 
 ## Low Priority
 
@@ -45,6 +51,13 @@ Medium (important, not blocking), Low (nice-to-have / hygiene).
 
 ## Completed
 
+- **Plugin framework (M8)** — EventBus, manifest + permissions + version compat,
+  PluginContext (DI), registry/loader/manager, lifecycle + dependency ordering +
+  failure isolation, plugin API, SDK, example plugin, plugins REST API.
+  Status: Done · Priority: High · Milestone: M8
+- **Event system (M8)** — Pub/sub EventBus with error isolation; chat/tool/system
+  events emitted.
+  Status: Done · Priority: High · Milestone: M8
 - **Desktop UI (M7)** — Full React chat interface: sidebar/history/search,
   streaming, markdown + syntax highlighting + copy, attachments + drag-drop,
   settings, theme switching, notifications, indicators, shortcuts, a11y.

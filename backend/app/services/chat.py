@@ -19,6 +19,7 @@ from dataclasses import dataclass
 from app.models import Message, MessageRole
 from app.repositories.conversations import ConversationRepository
 from app.services.ai.base import AIProvider, CompletionResult, Usage
+from app.services.eventbus import EventBus, EventName
 from app.services.memory import MemoryService
 
 
@@ -58,10 +59,17 @@ class ChatService:
         conversations: ConversationRepository,
         memory: MemoryService,
         provider: AIProvider,
+        *,
+        event_bus: EventBus | None = None,
     ) -> None:
         self._conversations = conversations
         self._memory = memory
         self._provider = provider
+        self._events = event_bus
+
+    async def _emit(self, name: str, **payload: object) -> None:
+        if self._events is not None:
+            await self._events.emit(name, **payload)
 
     async def send_message(self, conversation_id: str, content: str) -> ChatTurn:
         """Persist ``content`` as a user message and return the assistant reply.
@@ -71,6 +79,7 @@ class ChatService:
         confirmed to exist).
         """
         await self._append_user_message(conversation_id, content)
+        await self._emit(EventName.CHAT_MESSAGE_CREATED, conversation_id=conversation_id)
         context = await self._memory.build_context(conversation_id)
 
         completion = await self._provider.generate(context)
@@ -87,6 +96,11 @@ class ChatService:
             ),
             token_count=completion.usage.completion_tokens if completion.usage else None,
         )
+        await self._emit(
+            EventName.CHAT_RESPONSE_COMPLETED,
+            conversation_id=conversation_id,
+            provider=completion.provider,
+        )
         return ChatTurn(message=assistant, completion=completion)
 
     async def stream_message(
@@ -99,6 +113,7 @@ class ChatService:
         stream finishes so a partial reply is never persisted.
         """
         await self._append_user_message(conversation_id, content)
+        await self._emit(EventName.CHAT_MESSAGE_CREATED, conversation_id=conversation_id)
         context = await self._memory.build_context(conversation_id)
 
         parts: list[str] = []
@@ -120,6 +135,11 @@ class ChatService:
                 finish_reason=finish_reason,
                 usage=None,
             ),
+        )
+        await self._emit(
+            EventName.CHAT_RESPONSE_COMPLETED,
+            conversation_id=conversation_id,
+            provider=self._provider.name,
         )
         yield ChatDone(
             message=assistant,

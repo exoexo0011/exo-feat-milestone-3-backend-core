@@ -5,6 +5,32 @@ Severity: Critical / High / Medium / Low.
 
 ## Open
 
+### ISSUE-011 - Plugins run in-process (no true sandbox)
+- **Severity:** Medium
+- **Status:** Open (by design for now)
+- **Description:** Plugins are imported into the backend process. Permissions
+  are enforced at the `PluginContext` boundary, but Python has no true sandbox,
+  so a malicious plugin could bypass checks by importing modules directly.
+- **Workaround:** Only install trusted plugins.
+- **Planned fix:** Subprocess/WASM isolation (future).
+
+### ISSUE-010 - Plugin routes persist after disable
+- **Severity:** Low
+- **Status:** Open
+- **Description:** API routers mounted by a plugin remain routable until the
+  process restarts; disabling a plugin stops its tools/commands/events/hooks but
+  not already-mounted routes.
+- **Workaround:** Restart to fully remove plugin routes.
+- **Planned fix:** Route teardown / guarded mounting (future).
+
+### ISSUE-009 - Plugin settings are not persisted
+- **Severity:** Low
+- **Status:** Open
+- **Description:** `context.get_setting`/`set_setting` use an in-memory store per
+  plugin; values are lost on restart.
+- **Workaround:** N/A.
+- **Planned fix:** Persist plugin settings via the preferences store.
+
 ### ISSUE-008 - Tool-execution indicators have no backend events yet
 - **Severity:** Low
 - **Status:** Open

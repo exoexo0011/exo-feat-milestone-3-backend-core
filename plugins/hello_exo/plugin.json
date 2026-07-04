@@ -1,0 +1,11 @@
+{
+  "name": "hello_exo",
+  "version": "1.0.0",
+  "author": "EXO Team",
+  "description": "Example plugin: a greeting tool, a command, and event logging.",
+  "permissions": ["tool_access", "notifications"],
+  "dependencies": [],
+  "min_exo_version": "0.8.0",
+  "entry_point": "register",
+  "enabled_by_default": true
+}

@@ -4,6 +4,60 @@ Chronological record of significant technical decisions. Newest first.
 
 ---
 
+## ADR-0018 - In-process plugins with permission-boundary enforcement
+
+- **Date:** 2026-07-04 (M8)
+- **Decision:** Load plugins in the backend process; enforce declared
+  permissions at the `PluginContext` API boundary and validate plugin tool
+  capabilities against grants. Do not attempt a true sandbox.
+- **Reason:** In-process loading gives plugins first-class access to the tool
+  registry, event bus and routers with minimal complexity; boundary enforcement
+  plus confirmation flows cover the common cases.
+- **Alternatives considered:** Subprocess or WASM isolation (much more complex,
+  IPC overhead, limited API surface).
+- **Advantages:** Simple, powerful plugin API; fast; easy to test.
+- **Disadvantages:** No hard security boundary - a malicious plugin can bypass
+  checks by importing modules directly. Documented; only trusted plugins.
+- **Impact:** Whole plugin subsystem; recorded as a KNOWN_ISSUE.
+
+## ADR-0017 - Plugin registration is pure recording; manager applies/reverts
+
+- **Date:** 2026-07-04 (M8)
+- **Decision:** `register(context)` only records intended contributions; the
+  `PluginManager` applies them on enable and reverts on disable.
+- **Reason:** Symmetric enable/disable, and a `register` that raises midway
+  leaves no partial state (error isolation).
+- **Alternatives considered:** Register mutating shared state directly.
+- **Advantages:** Clean lifecycle, safe failures, testable.
+- **Disadvantages:** Slight indirection; already-mounted routes can't be
+  reverted (documented).
+- **Impact:** `PluginContext`, `PluginManager`.
+
+## ADR-0016 - Load plugins via importlib file-location under unique module names
+
+- **Date:** 2026-07-04 (M8)
+- **Decision:** Import each plugin package from its `__init__.py` under a unique
+  `exo_plugins.<name>` module name (not by mutating `sys.path`).
+- **Reason:** Avoids import-namespace clashes between plugins and the app; makes
+  reload possible (drop and re-exec the module).
+- **Alternatives considered:** Adding the plugins dir to `sys.path`.
+- **Advantages:** Isolation of module names; supports reload.
+- **Disadvantages:** Slightly more code than a bare import.
+- **Impact:** `loader.py`.
+
+## ADR-0015 - EventBus with per-handler error isolation
+
+- **Date:** 2026-07-04 (M8)
+- **Decision:** A single in-process pub/sub `EventBus`; handlers may be sync or
+  async and their exceptions are logged and swallowed.
+- **Reason:** Decouple producers from plugin consumers; a faulty subscriber must
+  never break chat/tool flows.
+- **Alternatives considered:** Direct callbacks; an external broker (overkill for
+  a local app).
+- **Advantages:** Simple, robust, dependency-free.
+- **Disadvantages:** In-process only (no cross-process events).
+- **Impact:** `eventbus.py`; chat/tool/system/plugin emitters.
+
 ## ADR-0014 - Per-turn WebSocket for streaming
 
 - **Date:** 2026-07-04 (M7)

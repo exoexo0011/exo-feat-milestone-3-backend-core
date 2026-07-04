@@ -11,10 +11,10 @@ extensibility via plugins.
 
 ## Status
 
-- **Current version:** 0.7.0
-- **Current milestone:** Milestone 7 - Desktop UI & Electron Integration (completed)
-- **Next milestone:** Milestone 8 - Plugin system
-- **Estimated overall completion:** ~82%
+- **Current version:** 0.8.0
+- **Current milestone:** Milestone 8 - Plugin Framework (completed)
+- **Next milestone:** Milestone 9 - Documentation & packaging
+- **Estimated overall completion:** ~90%
 
 ## Completed milestones
 
@@ -36,19 +36,24 @@ extensibility via plugins.
   Zustand stores, typed REST + WebSocket clients, and Electron integration
   (backend process manager + auto-restart, secure IPC, native notifications,
   system tray, window-state persistence). Vitest test suite.
+- [x] **M8 - Plugin framework:** EventBus, plugin manifest + permissions +
+  version compatibility, PluginContext (DI), registry/loader/manager with
+  lifecycle, dependency ordering, failure isolation, enable/disable/reload,
+  plugin API (tools/commands/routes/ws/settings/ui/hooks/events), SDK, example
+  plugin, and plugins REST API.
 
 ## In progress
 
-- [ ] None (M7 complete; awaiting review before M8).
+- [ ] None (M8 complete; awaiting review before M9).
 
 ## Remaining milestones
 
-- [ ] **M8 - Plugin system:** `PluginManager`, manifest validation, capability
-  scoping, plugin-contributed tools/routes discovered at startup.
 - [ ] **M9 - Documentation & packaging:** `docs/api.md`, `docs/installation.md`,
   `docs/developer-guide.md`, installers, release pipeline, real E2E tests.
 - [ ] **Chat tool-calling loop:** let the model invoke tools during a chat turn
   and stream `tool` events to the (already built) UI indicators.
+- [ ] **Plugin isolation hardening:** subprocess/WASM sandboxing for true
+  process isolation; route teardown on disable.
 
 > Note: milestone numbering follows the delivery order agreed in this project.
 > The plugin system (originally referenced as "Milestone 6" in early notes) is
@@ -94,16 +99,21 @@ extensibility via plugins.
   implemented and compiles but is not exercised in this headless environment.
 - File attachments are folded into the message text (text files only); binary
   files are noted but not uploaded.
+- Plugins run in-process: permissions are enforced at the PluginContext boundary
+  but there is no true OS sandbox (only trusted plugins should be installed).
+- Plugin-mounted API routes persist until restart (disable stops tools/commands/
+  events/hooks but not already-mounted routes).
+- Plugin settings are in-memory (not persisted across restarts yet).
 
 ## Completion by area
 
 | Area | Progress |
 |---|---|
-| Backend core | 95% |
+| Backend core | 97% |
 | AI system | 90% |
 | Chat system | 85% |
-| Tool system | 90% |
-| Plugin system | 0% |
+| Tool system | 92% |
+| Plugin system | 90% |
 | Frontend | 85% |
-| Documentation | 65% |
-| **Overall** | **~82%** |
+| Documentation | 70% |
+| **Overall** | **~90%** |

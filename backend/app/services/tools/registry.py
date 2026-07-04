@@ -30,6 +30,10 @@ class ToolRegistry:
             raise ValueError(f"A tool named '{tool.name}' is already registered")
         self._tools[tool.name] = tool
 
+    def unregister(self, name: str) -> None:
+        """Remove a tool if present (used when a plugin is disabled/unloaded)."""
+        self._tools.pop(name, None)
+
     def get(self, name: str) -> BaseTool[Any]:
         """Return the tool named ``name`` or raise :class:`ToolNotFoundError`."""
         try:

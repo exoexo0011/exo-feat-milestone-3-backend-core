@@ -70,6 +70,12 @@ class Settings(BaseSettings):
     tool_allowed_apps: list[str] = []
     tool_denied_permissions: list[str] = []
 
+    # --- Plugin framework -------------------------------------------------
+    # ``plugins_enabled`` is the master switch; ``plugins_dir`` is where plugin
+    # packages are discovered (each a folder with a plugin.json manifest).
+    plugins_enabled: bool = True
+    plugins_dir: str = "../plugins"
+
 
 @lru_cache
 def get_settings() -> Settings:
