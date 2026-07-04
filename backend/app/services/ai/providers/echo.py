@@ -39,6 +39,10 @@ class EchoProvider(AIProvider):
     def __init__(self, *, model: str = "echo") -> None:
         self._model = model
 
+    @property
+    def model(self) -> str | None:
+        return self._model
+
     @classmethod
     def from_settings(cls, settings: Settings) -> EchoProvider:
         return cls(model=settings.ai_model or "echo")

@@ -41,6 +41,10 @@ class HttpChatProvider(AIProvider):
         self._client = client
         self._owns_client = client is None
 
+    @property
+    def model(self) -> str | None:
+        return self._model
+
     # -- resource management ------------------------------------------------
 
     def _get_client(self) -> httpx.AsyncClient:

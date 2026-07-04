@@ -1,5 +1,14 @@
 """Pydantic request/response schemas."""
 
+from app.schemas.chat import (
+    ChatRequest,
+    ChatResponse,
+    ChatSocketRequest,
+    ChatUsage,
+    DoneEvent,
+    ErrorEvent,
+    TokenEvent,
+)
 from app.schemas.conversation import (
     ConversationCreate,
     ConversationRead,
@@ -18,9 +27,15 @@ from app.schemas.user import (
 
 __all__ = [
     "AssistantActionRead",
+    "ChatRequest",
+    "ChatResponse",
+    "ChatSocketRequest",
+    "ChatUsage",
     "ConversationCreate",
     "ConversationRead",
     "ConversationUpdate",
+    "DoneEvent",
+    "ErrorEvent",
     "HealthResponse",
     "MessageCreate",
     "MessageRead",
@@ -28,6 +43,7 @@ __all__ = [
     "PreferencesRead",
     "SystemEventCreate",
     "SystemEventRead",
+    "TokenEvent",
     "UserProfileRead",
     "UserProfileUpdate",
 ]

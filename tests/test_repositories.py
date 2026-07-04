@@ -1,30 +1,17 @@
 """Repository layer tests against an in-memory SQLite database."""
 
-from collections.abc import AsyncIterator
-
 import pytest
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import NotFoundError
-from app.models import ActionStatus, Base, MessageRole
+from app.models import ActionStatus, MessageRole
 from app.repositories.conversations import ConversationRepository
 from app.repositories.events import EventRepository
 from app.repositories.users import UserRepository
 
 
-@pytest.fixture
-async def session() -> AsyncIterator[AsyncSession]:
-    engine = create_async_engine("sqlite+aiosqlite://")
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    factory = async_sessionmaker(engine, expire_on_commit=False)
-    async with factory() as db_session:
-        yield db_session
-    await engine.dispose()
-
-
-async def test_conversation_crud(session: AsyncSession) -> None:
-    repo = ConversationRepository(session)
+async def test_conversation_crud(db_session: AsyncSession) -> None:
+    repo = ConversationRepository(db_session)
 
     conversation = await repo.create("My first chat")
     assert conversation.id
@@ -44,8 +31,8 @@ async def test_conversation_crud(session: AsyncSession) -> None:
         await repo.get(conversation.id)
 
 
-async def test_messages_are_ordered_and_cascade(session: AsyncSession) -> None:
-    repo = ConversationRepository(session)
+async def test_messages_are_ordered_and_cascade(db_session: AsyncSession) -> None:
+    repo = ConversationRepository(db_session)
     conversation = await repo.create()
 
     await repo.add_message(conversation.id, role=MessageRole.USER, content="Hello")
@@ -67,14 +54,14 @@ async def test_messages_are_ordered_and_cascade(session: AsyncSession) -> None:
         await repo.list_messages(conversation.id)
 
 
-async def test_unknown_conversation_raises(session: AsyncSession) -> None:
-    repo = ConversationRepository(session)
+async def test_unknown_conversation_raises(db_session: AsyncSession) -> None:
+    repo = ConversationRepository(db_session)
     with pytest.raises(NotFoundError):
         await repo.get("does-not-exist")
 
 
-async def test_default_profile_and_preference_upsert(session: AsyncSession) -> None:
-    repo = UserRepository(session)
+async def test_default_profile_and_preference_upsert(db_session: AsyncSession) -> None:
+    repo = UserRepository(db_session)
 
     profile = await repo.get_or_create_default()
     again = await repo.get_or_create_default()
@@ -91,8 +78,8 @@ async def test_default_profile_and_preference_upsert(session: AsyncSession) -> N
     assert updated.display_name == "Ada"
 
 
-async def test_events_and_action_lifecycle(session: AsyncSession) -> None:
-    repo = EventRepository(session)
+async def test_events_and_action_lifecycle(db_session: AsyncSession) -> None:
+    repo = EventRepository(db_session)
 
     await repo.log_event(level="info", source="startup", message="Backend booted")
     events = await repo.list_events(source="startup")

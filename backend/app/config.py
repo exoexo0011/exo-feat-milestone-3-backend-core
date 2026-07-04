@@ -37,6 +37,13 @@ class Settings(BaseSettings):
     ai_max_tokens: int = 1024
     ai_request_timeout: float = 60.0
 
+    # --- Chat pipeline ----------------------------------------------------
+    # ``chat_system_prompt`` is prepended to every conversation sent to the
+    # provider. ``chat_max_context_messages`` bounds how many of the most
+    # recent stored messages are replayed as context (0 disables history).
+    chat_system_prompt: str | None = "You are EXO, a helpful, concise AI desktop assistant."
+    chat_max_context_messages: int = 20
+
     # --- OpenAI provider --------------------------------------------------
     # The API key accepts either ``EXO_OPENAI_API_KEY`` or the conventional
     # ``OPENAI_API_KEY`` so existing environments work unchanged.

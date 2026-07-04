@@ -94,3 +94,24 @@ class ConversationRepository(BaseRepository):
         )
         result = await self._session.execute(stmt)
         return result.scalars().all()
+
+    async def list_recent_messages(
+        self, conversation_id: str, *, limit: int = 20
+    ) -> Sequence[Message]:
+        """Return the most recent ``limit`` messages in chronological order.
+
+        Unlike :meth:`list_messages` (oldest-first from an offset), this selects
+        the newest messages then restores ascending order, which is what the
+        chat context window needs.
+        """
+        await self.get(conversation_id)  # Raises NotFoundError for unknown ids.
+        if limit <= 0:
+            return []
+        stmt = (
+            select(Message)
+            .where(Message.conversation_id == conversation_id)
+            .order_by(Message.created_at.desc())
+            .limit(limit)
+        )
+        result = await self._session.execute(stmt)
+        return list(reversed(result.scalars().all()))

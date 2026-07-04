@@ -38,4 +38,6 @@ Key principles:
 - REST for CRUD (conversations, settings, tools, memory, health).
 - WebSocket `/ws/chat` for token streaming, tool status events and confirmation prompts.
 
-Further documents: `docs/api.md`, `docs/installation.md`, `docs/developer-guide.md` (Milestone 8).
+Further documents: `docs/ai-providers.md` (provider layer, Milestone 4),
+`docs/chat.md` (chat pipeline: REST + WebSocket, Milestone 5). Planned:
+`docs/api.md`, `docs/installation.md`, `docs/developer-guide.md` (Milestone 8).

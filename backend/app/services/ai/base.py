@@ -96,6 +96,15 @@ class AIProvider(ABC):
     #: Unique lookup name used by the factory (e.g. ``"openai"``).
     name: str
 
+    @property
+    def model(self) -> str | None:
+        """The default model this provider is configured to use, if known.
+
+        Providers that target a specific model should override this; the base
+        returns ``None`` for providers where a model is not meaningful.
+        """
+        return None
+
     @classmethod
     @abstractmethod
     def from_settings(cls, settings: Settings) -> AIProvider:
