@@ -113,8 +113,9 @@ At runtime the Electron main process (`electron/backend.ts`) spawns the bundled
 at the per-user `userData` directory), and uses your local `python -m uvicorn`
 in development.
 
-The GitLab CI pipeline (`.gitlab-ci.yml`) runs lint, tests (backend + frontend),
-build, and E2E on every push, and a tag-triggered `release` job builds artifacts.
+The GitHub Actions pipeline (`.github/workflows/ci.yml`) runs lint, tests
+(backend + frontend), build, and E2E on every push, and a tag-triggered
+`release` job builds artifacts.
 
 ## Contribution workflow
 

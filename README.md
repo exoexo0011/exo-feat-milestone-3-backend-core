@@ -9,8 +9,8 @@ EXO is a modern, modular, production-grade desktop AI assistant.
 ## Quick Start
 
 ```bash
-git clone https://gitlab.com/exo-group9325627/exo.git
-cd exo
+git clone https://github.com/exoexo0011/exo-feat-milestone-3-backend-core.git
+cd exo-feat-milestone-3-backend-core
 ./scripts/bootstrap.sh        # installs everything and starts backend + frontend
 ```
 

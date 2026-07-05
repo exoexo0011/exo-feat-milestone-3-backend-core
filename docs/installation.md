@@ -9,8 +9,8 @@
 ## Quick start (developers)
 
 ```bash
-git clone https://gitlab.com/exo-group9325627/exo.git
-cd exo
+git clone https://github.com/exoexo0011/exo-feat-milestone-3-backend-core.git
+cd exo-feat-milestone-3-backend-core
 ./scripts/bootstrap.sh          # Linux/macOS: venv + deps + dev servers
 # Windows PowerShell:
 #   .\scripts\bootstrap.ps1

@@ -288,10 +288,10 @@ electron-builder (frontend/electron-builder.yml)
   `<resources>/backend/exo-backend`, health-checks it, and points `EXO_DB_PATH` /
   `EXO_LOG_DIR` at the OS `userData` directory (writable).
 - **Build scripts:** `scripts/package.sh` / `scripts/package.ps1` run both steps.
-- **CI (`.gitlab-ci.yml`):** stages `lint → test → build → e2e → release`.
-  `test` runs pytest + Vitest; `e2e` provisions Python (uv) + Chromium
-  (Playwright) and runs the smoke suite; `release` (on tags) builds the backend
-  bundle and desktop installer artifacts.
+- **CI (`.github/workflows/ci.yml`, GitHub Actions):** jobs for backend lint +
+  test, frontend lint + test + build, an `e2e` job (Python + Chromium via
+  Playwright) running the smoke suite, and a tag-triggered `release` job that
+  builds the backend bundle and desktop installer artifacts.
 - **E2E:** Playwright starts the backend (echo provider) + Vite dev server via
   managed `webServer`s and drives headless Chromium (`frontend/e2e/`).
 

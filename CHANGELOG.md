@@ -281,10 +281,10 @@ is a minor release).
 - FastAPI app factory, `/api/health` endpoint, and the frontend skeleton shell
   verifying the full stack.
 
-[Unreleased]: https://gitlab.com/exo-group9325627/exo/-/compare/v0.9.0...HEAD
-[0.9.0]: https://gitlab.com/exo-group9325627/exo/-/releases/v0.9.0
-[0.8.0]: https://gitlab.com/exo-group9325627/exo/-/releases/v0.8.0
-[0.7.0]: https://gitlab.com/exo-group9325627/exo/-/releases/v0.7.0
-[0.6.0]: https://gitlab.com/exo-group9325627/exo/-/releases/v0.6.0
-[0.5.0]: https://gitlab.com/exo-group9325627/exo/-/releases/v0.5.0
-[0.4.0]: https://gitlab.com/exo-group9325627/exo/-/releases/v0.4.0
+[Unreleased]: https://github.com/exoexo0011/exo-feat-milestone-3-backend-core/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/exoexo0011/exo-feat-milestone-3-backend-core/releases/tag/v0.9.0
+[0.8.0]: https://github.com/exoexo0011/exo-feat-milestone-3-backend-core/releases/tag/v0.8.0
+[0.7.0]: https://github.com/exoexo0011/exo-feat-milestone-3-backend-core/releases/tag/v0.7.0
+[0.6.0]: https://github.com/exoexo0011/exo-feat-milestone-3-backend-core/releases/tag/v0.6.0
+[0.5.0]: https://github.com/exoexo0011/exo-feat-milestone-3-backend-core/releases/tag/v0.5.0
+[0.4.0]: https://github.com/exoexo0011/exo-feat-milestone-3-backend-core/releases/tag/v0.4.0
